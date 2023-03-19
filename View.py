@@ -1,5 +1,7 @@
 import tkinter
 from tkinter import ttk, PhotoImage, scrolledtext
+
+import pygame as pygame
 from PIL import Image, ImageTk
 
 
@@ -45,7 +47,7 @@ class View(ttk.Frame):
         self.console_frame = ttk.Frame(self, height=self.CONSOLE_FRAME_HEIGHT, width=self.WIDTH)
 
         # Set menu background
-        self.menu_image = Image.open("menu.jpg")
+        self.menu_image = Image.open("images/menu.jpg")
         self.menu_image = self.menu_image.resize((self.MENU_FRAME_WIDTH, self.MENU_FRAME_HEIGHT))
         self.menu_photo = ImageTk.PhotoImage(self.menu_image)
         self.menu_label = ttk.Label(self.menu_frame, image=self.menu_photo)
@@ -53,14 +55,14 @@ class View(ttk.Frame):
         self.menu_label.grid(row=0, column=0, sticky="nsew")
 
         # Set Menu Logo
-        self.logo_image = Image.open("logo.jpg")
+        self.logo_image = Image.open("images/logo.jpg")
         self.logo_image = self.logo_image.resize((self.LOGO_WIDTH, self.LOGO_HEIGHT))
         self.logo_photo = ImageTk.PhotoImage(self.logo_image)
         self.logo_label = ttk.Label(self.menu_frame, image=self.logo_photo)
         self.logo_label.place(relx=0, rely=0, relwidth=0.26, relheight=0.128)
 
         # Set Mission statement background
-        self.mission_statement_image = Image.open("mission.jpg")
+        self.mission_statement_image = Image.open("images/mission.jpg")
         self.mission_statement_image = self.mission_statement_image.resize(
             (self.MISSION_STATEMENT_WIDTH, self.MISSION_STATEMENT_HEIGHT))
         self.mission_statement_photo = ImageTk.PhotoImage(self.mission_statement_image)
@@ -68,7 +70,7 @@ class View(ttk.Frame):
         self.mission_statement_label.place(relx=0.25, rely=0, relwidth=0.75, relheight=0.128)
 
         # set filter frame background
-        self.filter_image = Image.open("galaxy.jpg")
+        self.filter_image = Image.open("images/galaxy.jpg")
         self.filter_image = self.filter_image.resize((self.FILTER_FRAME_WIDTH, self.FILTER_FRAME_HEIGHT))
         self.filter_photo = ImageTk.PhotoImage(self.filter_image)
         self.filter_label = ttk.Label(self.filter_frame, image=self.filter_photo)
@@ -98,7 +100,8 @@ class View(ttk.Frame):
     # This method will draw all widgets onto the layout, must be called after instantiation and assignment of controller
     # in APP
     def draw_widgets(self):
-        # CONSOLE WIDGETS //////////////////////////////////////////////////////////////////////////////////////////////
+
+        # ///////// CONSOLE WIDGETS ///////////////////////////////////////////////////////////////////////////////////
 
         # instantiate a read only not clickable text box to act as Console output
         self.console_text_output = scrolledtext.ScrolledText(self.console_frame, wrap='word', width=30, height=10,
@@ -130,23 +133,87 @@ class View(ttk.Frame):
         # ******* OR THIS SIMPLE BUTTON THAT WE CAN CONTROL THE COLOR BUT ITS FLAT *******
         clear_filter_button = tkinter.Button(self.console_frame, text="clear Filters", bg="#9A9AC0", fg="black",
                                              font=("Arial", 20),
+                                             bd=3,
+                                             relief="raised",
+                                             borderwidth=3,
+                                             highlightthickness=0,
                                              command=self.controller.clear_filters)
 
         clear_filter_button.grid(row=0, column=2, sticky="nsew")
 
-        # MENU WIDGETS ////////////////////////////////////////////////////////////////////////////////////////////////
+        # ///////// MENU WIDGETS ///////////////////////////////////////////////////////////////////////////////////
 
         # define a variable value for the selection box
         self.planet_selection = tkinter.StringVar()
-        self.planet_selection.set("select an item")
+        self.planet_selection.set("Select a planet")
 
         # build scrollable combo box using Model data
         self.selection_dropdown = ttk.Combobox(self.menu_frame, textvariable=self.planet_selection,
                                                values=self.controller.get_planets(),
                                                height=5)
         self.selection_dropdown.config(font=('Arial', 12), background="white", justify='center')
-        self.selection_dropdown['values'] = self.controller.get_planets_names()
-        self.selection_dropdown.place(relx=0.5, rely=0.2, relwidth=0.7, relheight=0.08, anchor='n')
+        # self.selection_dropdown['values'] = self.controller.get_planets_names()
+        self.selection_dropdown.place(relx=0.5, rely=0.30, relwidth=0.8, relheight=0.05, anchor='n')
 
+        # create quit button
+        quit_button = tkinter.Button(self.menu_frame, text="Quit", bd=3, relief="raised",
+                                     borderwidth=5, highlightthickness=0,
+                                     highlightbackground="blue",
+                                     font=("Arial", 20, "bold"),
+                                     background="red",
+                                     command=self.parent.destroy)
+
+        quit_button.place(relx=0.1, rely=0.18, relwidth=0.25, relheight=0.08)
+
+        # create calculate button
+        calculate_button = tkinter.Button(self.menu_frame, text="Calculate", bd=3, relief="raised",
+                                          borderwidth=5, highlightthickness=0,
+                                          highlightbackground="blue",
+                                          font=("Arial", 20, "bold"),
+                                          background="green",
+                                          command=self.create_visualization_screen
+                                          )
+
+        calculate_button.place(relx=0.1, rely=0.85, relwidth=0.8, relheight=0.05)
+
+        # //// FILTER WIDGETS /////////////////////////////////////////////////////////////////////////////////////////
+
+    # assign controller value to view
     def set_controller(self, controller):
         self.controller = controller
+
+    # instantiate a pygame window for the purposes of visualization. This could change over development time
+    def create_visualization_screen(self):
+
+        # retrieve planet from model
+        selected_planet = self.controller.get_selected_planet()
+
+        # ensure planet was passed, if object does not exist stop function dont instantiate pygame
+        if selected_planet is None:
+            return
+        else:
+
+            # define some test data to display
+            text = "Selected Planet values: Name={}, Range={}, mass={}".format(selected_planet.name,
+                                                                               selected_planet.distance,
+                                                                               selected_planet.mass)
+            # define the window
+            pygame.init()
+            screen = pygame.display.set_mode((800, 800))
+            pygame.display.set_caption("SandGlass Visualizer")
+
+            # define the text for display test
+            font = pygame.font.SysFont("Arial", 20)
+            text_render = font.render(text, True, (255, 255, 255))
+
+            # Pygame loop
+            running = True
+            while running:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        running = False
+
+                screen.blit(text_render, (10, 10))
+                pygame.display.flip()
+
+            pygame.quit()

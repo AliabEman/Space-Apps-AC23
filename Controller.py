@@ -31,3 +31,28 @@ class Controller:
         for planet in self.model.filteredPlanets:
             name = planet.name
             selection_dropdown_planet_names.append(name)
+
+    # function to be replaced by calculation and visualization, For now it just retrieves the selected planet from the
+    # list and passes some information to the Pygame window for testing purposes.
+    def get_selected_planet(self):
+
+        # grab string value from selection drop down menu
+        selected_planet = self.view.selection_dropdown.get()
+
+        if selected_planet == "Select a planet":
+            self.view.console_text_output.configure(state='normal')
+            self.view.console_text_output.insert('end', 'Invalid selection, please choose planet from drop down!\n')
+            self.view.console_text_output.configure(state='disabled')
+            return
+
+        else:
+            for planet in self.model.planets:
+                if planet.name == selected_planet:
+                    selected_planet = planet
+                    return selected_planet
+
+
+
+
+
+        test = selected_planet
