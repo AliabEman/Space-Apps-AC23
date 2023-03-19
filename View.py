@@ -18,6 +18,12 @@ class View(ttk.Frame):
         self.console_text_output = None
         self.selection_dropdown = None
         self.planet_selection = None
+        self.name_input = None
+        self.range_input = None
+        self.mass_input = None
+        self.name_submit_button = None
+        self.range_submit_button = None
+        self.mass_submit_button = None
 
         # empty reference will be set after controller is instantiated in APP
         self.controller = None
@@ -73,8 +79,12 @@ class View(ttk.Frame):
         self.filter_image = Image.open("images/galaxy.jpg")
         self.filter_image = self.filter_image.resize((self.FILTER_FRAME_WIDTH, self.FILTER_FRAME_HEIGHT))
         self.filter_photo = ImageTk.PhotoImage(self.filter_image)
-        self.filter_label = ttk.Label(self.filter_frame, image=self.filter_photo)
-        self.filter_label.place(relx=0, rely=0, relwidth=1, relheight=1)
+
+        # using canvas for filter, so we can write text on it without background containers
+        self.filter_canvas = tkinter.Canvas(self.filter_frame, width=self.FILTER_FRAME_WIDTH,
+                                            height=self.FILTER_FRAME_HEIGHT)
+        self.filter_canvas.place(relx=0, rely=0, relwidth=1, relheight=1)
+        self.filter_canvas.create_image(0, 0, image=self.filter_photo, anchor="nw")
 
         # place child frames
         self.menu_frame.grid(row=0, column=0, rowspan=3, sticky="nsew")
@@ -100,7 +110,6 @@ class View(ttk.Frame):
     # This method will draw all widgets onto the layout, must be called after instantiation and assignment of controller
     # in APP
     def draw_widgets(self):
-
         # ///////// CONSOLE WIDGETS ///////////////////////////////////////////////////////////////////////////////////
 
         # instantiate a read only not clickable text box to act as Console output
@@ -178,17 +187,81 @@ class View(ttk.Frame):
 
         # //// FILTER WIDGETS /////////////////////////////////////////////////////////////////////////////////////////
 
+        # this is super janky because python fucking blows, The spaced strings are to line up the words
+        planet_name_label = "Planet Name"
+        planet_mass_label = "       Planet Max Mass"
+        planet_range_label = "         Planet Max Range"
+
+        string_height = 150
+        input_width = 30
+        input_font = ("Arial", 16)
+        submit_font = ("Arial", 28, "bold")
+        canvas_font = ("Arial", 36, "bold")
+        canvas_text_color = "white"
+
+        # spacing for filter labels
+        y1 = self.FILTER_FRAME_HEIGHT / 2 - string_height
+        y2 = self.FILTER_FRAME_HEIGHT / 2
+        y3 = self.FILTER_FRAME_HEIGHT / 2 + string_height
+        input_y1 = y1 - 5
+        input_y2 = y2 - 5
+        input_y3 = y3 - 5
+
+        # draw labels on canvas
+        self.filter_canvas.create_text(self.FILTER_FRAME_WIDTH / 5, y1, text=planet_name_label, font=canvas_font,
+                                       fill=canvas_text_color, justify="left")
+        self.filter_canvas.create_text(self.FILTER_FRAME_WIDTH / 5, y2, text=planet_range_label, font=canvas_font,
+                                       fill=canvas_text_color, justify="left")
+        self.filter_canvas.create_text(self.FILTER_FRAME_WIDTH / 5, y3, text=planet_mass_label, font=canvas_font,
+                                       fill=canvas_text_color, justify="left")
+
+        # draw all input boxes
+        self.name_input = tkinter.Entry(self.filter_canvas, font=input_font, width=input_width, justify="center")
+        # self.name_input.place(x=self.FILTER_FRAME_WIDTH / 2.5 + 10, y=input_y1, anchor="w", height=40)  # Exact place
+        self.name_input.place(relx=0.4, rely=0.29, relheight=0.05, relwidth=0.3)  # relative placing
+
+        self.range_input = tkinter.Entry(self.filter_canvas, font=input_font, width=input_width, justify="center")
+        # self.range_input.place(x=self.FILTER_FRAME_WIDTH / 2.5 + 10, y=input_y2, anchor="w", height=40) # Exact place
+        self.range_input.place(relx=0.4, rely=0.48, relheight=0.05, relwidth=0.3)  # relative placing
+
+        self.mass_input = tkinter.Entry(self.filter_canvas, font=input_font, width=input_width, justify="center")
+        # self.mass_input.place(x=self.FILTER_FRAME_WIDTH / 2.5 + 10, y=input_y3, anchor="w",height = 40)  # Exact place
+        self.mass_input.place(relx=0.4, rely=0.67, relheight=0.05, relwidth=0.3)  # relative placing
+
+        quit_button = tkinter.Button(self.menu_frame, text="Quit", bd=3, relief="raised",
+                                     borderwidth=5, highlightthickness=0,
+                                     highlightbackground="blue",
+                                     font=("Arial", 20, "bold"),
+                                     background="red",
+                                     command=self.parent.destroy)
+
+        self.name_submit_button = tkinter.Button(self.filter_frame, text="Submit", background="green", relief="raised",
+                                                 borderwidth=5, highlightthickness=0, highlightbackground="blue",
+                                                 font=submit_font, justify="center")
+        self.name_submit_button.place(relx=0.725, rely=0.29, relwidth=0.2, relheight=0.05)
+
+        self.range_submit_button = tkinter.Button(self.filter_frame, text="Submit", background="green", relief="raised",
+                                                  borderwidth=5, highlightthickness=0, highlightbackground="blue",
+                                                  font=submit_font, justify="center")
+        self.range_submit_button.place(relx=0.725, rely=0.48, relwidth=0.2, relheight=0.05)
+
+        self.mass_submit_button = tkinter.Button(self.filter_frame, text="Submit", background="green", relief="raised",
+                                                 borderwidth=5, highlightthickness=0, highlightbackground="blue",
+                                                 font=submit_font, justify="center")
+        self.mass_submit_button.place(relx=0.725, rely=0.67, relwidth=0.2, relheight=0.05)
+
+    # //// VIEW FUNCTIONS //////////////////////////////////////////////////////////////////////////////////////////////
+
     # assign controller value to view
     def set_controller(self, controller):
         self.controller = controller
 
     # instantiate a pygame window for the purposes of visualization. This could change over development time
     def create_visualization_screen(self):
-
         # retrieve planet from model
         selected_planet = self.controller.get_selected_planet()
 
-        # ensure planet was passed, if object does not exist stop function dont instantiate pygame
+        # ensure planet was passed, if object does not exist stop function and do not instantiate pygame
         if selected_planet is None:
             return
         else:
