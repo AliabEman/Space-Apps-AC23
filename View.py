@@ -24,6 +24,8 @@ class View(ttk.Frame):
         self.name_submit_button = None
         self.range_submit_button = None
         self.mass_submit_button = None
+        self.slider_submit_button = None
+        self.efficiency_slider = None
 
         # empty reference will be set after controller is instantiated in APP
         self.controller = None
@@ -131,15 +133,6 @@ class View(ttk.Frame):
         self.console_text_output.configure(state='disabled')
 
         # create the clear filters button, stylize it and attach it to controller action
-
-        # ****** WE HAVE A CHOICE OF THIS STYLIZED GREY BUTTON THAT HIGHLIGHTS AND SUCH *****
-        # clear_button_style = ttk.Style()
-        # clear_button_style.configure('ClearFilterButton.TButton', font=('Arial', 20), background='#9A9AC0',
-        #                              foreground='black')
-        # clear_filter_button = ttk.Button(self.console_frame, text="clear Filters", style='ClearFilterButton.TButton',
-        #                                  command=self.controller.clear_filters)
-
-        # ******* OR THIS SIMPLE BUTTON THAT WE CAN CONTROL THE COLOR BUT ITS FLAT *******
         clear_filter_button = tkinter.Button(self.console_frame, text="clear Filters", bg="#9A9AC0", fg="black",
                                              font=("Arial", 20),
                                              bd=3,
@@ -159,9 +152,8 @@ class View(ttk.Frame):
         # build scrollable combo box using Model data
         self.selection_dropdown = ttk.Combobox(self.menu_frame, textvariable=self.planet_selection,
                                                values=self.controller.get_planets(),
-                                               height=5)
+                                               height=20, state="readonly")
         self.selection_dropdown.config(font=('Arial', 12), background="white", justify='center')
-        # self.selection_dropdown['values'] = self.controller.get_planets_names()
         self.selection_dropdown.place(relx=0.5, rely=0.30, relwidth=0.8, relheight=0.05, anchor='n')
 
         # create quit button
@@ -191,6 +183,7 @@ class View(ttk.Frame):
         planet_name_label = "Planet Name"
         planet_mass_label = "       Planet Max Mass"
         planet_range_label = "         Planet Max Range"
+        efficiency_label = "Efficiency      "
 
         string_height = 150
         input_width = 30
@@ -203,6 +196,7 @@ class View(ttk.Frame):
         y1 = self.FILTER_FRAME_HEIGHT / 2 - string_height
         y2 = self.FILTER_FRAME_HEIGHT / 2
         y3 = self.FILTER_FRAME_HEIGHT / 2 + string_height
+        y4 = self.FILTER_FRAME_HEIGHT / 2 + (string_height * 1.8)
         input_y1 = y1 - 5
         input_y2 = y2 - 5
         input_y3 = y3 - 5
@@ -213,6 +207,8 @@ class View(ttk.Frame):
         self.filter_canvas.create_text(self.FILTER_FRAME_WIDTH / 5, y2, text=planet_range_label, font=canvas_font,
                                        fill=canvas_text_color, justify="left")
         self.filter_canvas.create_text(self.FILTER_FRAME_WIDTH / 5, y3, text=planet_mass_label, font=canvas_font,
+                                       fill=canvas_text_color, justify="left")
+        self.filter_canvas.create_text(self.FILTER_FRAME_WIDTH / 5, y4, text=efficiency_label, font=canvas_font,
                                        fill=canvas_text_color, justify="left")
 
         # draw all input boxes
@@ -228,13 +224,7 @@ class View(ttk.Frame):
         # self.mass_input.place(x=self.FILTER_FRAME_WIDTH / 2.5 + 10, y=input_y3, anchor="w",height = 40)  # Exact place
         self.mass_input.place(relx=0.4, rely=0.67, relheight=0.05, relwidth=0.3)  # relative placing
 
-        quit_button = tkinter.Button(self.menu_frame, text="Quit", bd=3, relief="raised",
-                                     borderwidth=5, highlightthickness=0,
-                                     highlightbackground="blue",
-                                     font=("Arial", 20, "bold"),
-                                     background="red",
-                                     command=self.parent.destroy)
-
+        # draw the filter input submit buttons
         self.name_submit_button = tkinter.Button(self.filter_frame, text="Submit", background="green", relief="raised",
                                                  borderwidth=5, highlightthickness=0, highlightbackground="blue",
                                                  font=submit_font, justify="center")
@@ -250,6 +240,18 @@ class View(ttk.Frame):
                                                  font=submit_font, justify="center")
         self.mass_submit_button.place(relx=0.725, rely=0.67, relwidth=0.2, relheight=0.05)
 
+        self.slider_submit_button = tkinter.Button(self.filter_frame, text="Submit", background="green",
+                                                   relief="raised",
+                                                   borderwidth=5, highlightthickness=0, highlightbackground="blue",
+                                                   font=submit_font, justify="center",
+                                                   command=self.controller.submit_efficiency)
+        self.slider_submit_button.place(relx=0.725, rely=0.82, relwidth=0.2, relheight=0.05)
+
+        # draw the efficiency slider bar
+        self.efficiency_slider = tkinter.Scale(self.filter_frame, from_=1, to=100, orient=tkinter.HORIZONTAL, bg="blue",
+                                               font=("Arial", 12, "bold"))
+        self.efficiency_slider.place(relx=0.4, rely=0.82, relwidth=0.3, relheight=0.05)
+
     # //// VIEW FUNCTIONS //////////////////////////////////////////////////////////////////////////////////////////////
 
     # assign controller value to view
@@ -260,6 +262,7 @@ class View(ttk.Frame):
     def create_visualization_screen(self):
         # retrieve planet from model
         selected_planet = self.controller.get_selected_planet()
+        efficiency_index = self.controller.get_efficiency_index()
 
         # ensure planet was passed, if object does not exist stop function and do not instantiate pygame
         if selected_planet is None:
@@ -267,9 +270,10 @@ class View(ttk.Frame):
         else:
 
             # define some test data to display
-            text = "Selected Planet values: Name={}, Range={}, mass={}".format(selected_planet.name,
-                                                                               selected_planet.distance,
-                                                                               selected_planet.mass)
+            text = "Selected Planet values: Name={}, Range={}, mass={} Efficiency: {}".format(selected_planet.name,
+                                                                                              selected_planet.distance,
+                                                                                              selected_planet.mass,
+                                                                                              efficiency_index)
             # define the window
             pygame.init()
             screen = pygame.display.set_mode((800, 800))

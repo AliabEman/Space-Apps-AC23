@@ -51,8 +51,17 @@ class Controller:
                     selected_planet = planet
                     return selected_planet
 
+    def get_efficiency_index(self):
+        return self.model.efficiency_index
 
+    # function to set the efficiency index of the model for calculations and output a client message to console
+    def submit_efficiency(self):
+        efficiency_value = self.view.efficiency_slider.get()
 
+        self.model.efficiency_index = efficiency_value
 
-
-        test = selected_planet
+        # reset the output window text, include welcome message and filter message
+        self.view.console_text_output.configure(state='normal')
+        self.view.console_text_output.insert('end',
+                                             'Efficiency index of calculation set to ' + str(efficiency_value) + '\n')
+        self.view.console_text_output.configure(state='disabled')
