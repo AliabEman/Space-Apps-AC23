@@ -1,31 +1,51 @@
-# YouTube Reference Video: https://youtu.be/LTVvHObxc4
-
-#from tkinter import ttk, PhotoImage, Tk, Label, mainloop
-from tkinter import *
+from tkinter import Tk, Label, ttk
 from PIL import Image, ImageTk
 
-#Start with a splash window
-splash_root = Tk()
-splash_root.title("Splash Screen!")
-splash_root.geometry("300x200")
+def splash_screen_api():
+    # Start with a splash window
+    splash_root = Tk()
 
-#Timing the splash screen
-splash_label = Label(splash_root, text="Splash Screen!", font=("Arial",18))
-splash_label.pack(pady=20)
+    # Hide the title bar for the splash window
+    splash_root.overrideredirect(True)
 
-#Setting Image for Splash Screen
-#splash_root.splash_image = Image.open("images/Splash Screen.jpg")
-#splash_root.splash_image = splash_root.splash_image.resize((300, 200))
-#splash_root.splash_photo = ImageTk.PhotoImage(splash_root.splash_image)
-#splash_label = splash_label.Label(splash_root.splash_frame, image=splash_root.splash_photo)
+    # Define the size of the frame for the splash screen
+    splash_root.title("Splash Screen!")
+    splash_root.geometry("700x700")
 
-def main_window():
-    splash_root.destroy()
-    root = Tk()
-    root.title("Splash Screen")
-    root.geometry("500x550")
+    # Add the image to the splash screen
+    splash_label = Label(splash_root)
 
-#Splash Screen Timer
-splash_root.after(4000, main_window)
+    # Set the image for the splash screen
+    splash_image = Image.open("images/Splash Screen.jpg")
+    resized = splash_image.resize((600, 600), Image.ANTIALIAS)
+    splash_photo = ImageTk.PhotoImage(resized)
+    splash_label = ttk.Label(splash_root, image=splash_photo)
+    splash_label.pack()
 
-mainloop()
+    # Add the progress bar to the splash screen
+    my_progress = ttk.Progressbar(splash_root, orient="horizontal", length=400, mode="determinate")
+    my_progress.pack(pady=10)
+
+    # Add the progress label to the splash screen
+    progress_label = ttk.Label(splash_root, text="0%")
+    progress_label.pack()
+
+    # Define the function to update the progress bar
+    def update_progress():
+        progress = 0
+        while progress <= 100:
+            my_progress["value"] = progress
+            progress_label.config(text=f"{progress}%")
+            progress += 1
+            splash_root.update_idletasks()
+
+    # Call the update_progress function after 1 second
+    splash_root.after(1000, update_progress)
+
+    # Open the main window after 3 seconds
+    def main_window():
+        splash_root.destroy()
+
+    splash_root.after(3000, main_window)
+
+    splash_root.mainloop()

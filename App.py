@@ -4,6 +4,7 @@ import pandas
 from Controller import Controller
 from Model import Model
 from View import View
+import Splash
 
 
 class App(tk.Tk):
@@ -38,5 +39,6 @@ class App(tk.Tk):
 
 
 if __name__ == '__main__':
+    Splash.splash_screen_api()
     app = App()
     app.mainloop()
