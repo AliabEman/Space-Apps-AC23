@@ -39,6 +39,6 @@ class App(tk.Tk):
 
 
 if __name__ == '__main__':
-    Splash.splash_screen_api()
+    splash = Splash.splash_screen_api() #needs to destroy Splash screen outside of the splash api... right? (help)
     app = App()
     app.mainloop()
