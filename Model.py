@@ -17,4 +17,4 @@ class Model:
 
         # will probably need some fields to save model data in order to pass it to the algorithm?
         self.selected_planet = None
-
+        self.efficiency_index = 1
