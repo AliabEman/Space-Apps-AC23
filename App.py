@@ -66,7 +66,30 @@ class App(tk.Tk):
 
         self.splash = None
         self.start_up_app()
-
+        
+        #Function called if the CSV requires reformatting 
+        def cleanup_csv(nasa_data_frame):
+           nasa_data_frame = pandas.read_csv(csvName)
+           # Check the first 25 rows and columns for instances of the old column names or comments
+           n_rows, n_cols = nasa_data_frame.shape
+           for i in range(min(n_rows, 25)):
+               for j in range(min(n_cols, 25)):
+                   if nasa_data_frame.iloc[i, j] == 'pl_name':
+                       nasa_data_frame.iloc[i, j] = 'name'
+                   elif nasa_data_frame.iloc[i, j] == 'pl_bmasse' or nasa_data_frame.iloc[i, j] == 'pl_masse':
+                       nasa_data_frame.iloc[i, j] = 'mass'
+                   elif nasa_data_frame.iloc[i, j] == 'sy_dist':
+                       nasa_data_frame.iloc[i, j] = 'distance'
+                   elif '#' in str(nasa_data_frame.iloc[i, j]):
+                       nasa_data_frame = nasa_data_frame.drop(i)
+                   elif nasa_data_frame.columns[j] == 'name' and nasa_data_frame.iloc[i, j] == 'name':
+                       nasa_data_frame = nasa_data_frame.drop(i)
+                       
+           nasa_data_frame.to_csv(csvName, index=False) # Write the changes into the CSV
+           nasa_data_frame.reset_index(drop=True, inplace=True)
+           return nasa_data_frame# Function end
+        
+        
         self.title("MVC_CSV_GUI DEMO")
         # currently locking the parent window since the layout does not properly resize with window
         self.resizable(False, False)
@@ -125,3 +148,7 @@ class App(tk.Tk):
 
 if __name__ == '__main__':
     App()
+
+
+
+    
