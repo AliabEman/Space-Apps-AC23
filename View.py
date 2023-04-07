@@ -128,7 +128,6 @@ class View(ttk.Frame):
         # will need to be done in all update methods for this widget. There may be better options then this out there
         # console_text_output.configure(state='enabled')
         self.console_text_output.insert('end', 'Welcome to SandGlass!\n')
-        self.console_text_output.insert('end', 'This Is a new insert of text, this is how we do the filter text\n')
         self.console_text_output.grid(row=0, column=0, sticky="nsew")
         self.console_text_output.configure(state='disabled')
 
