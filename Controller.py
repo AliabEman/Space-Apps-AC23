@@ -65,3 +65,63 @@ class Controller:
         self.view.console_text_output.insert('end',
                                              'Efficiency index of calculation set to ' + str(efficiency_value) + '\n')
         self.view.console_text_output.configure(state='disabled')
+        
+    # Function to filter the list of planets based on the name entered by the user
+    def filter_by_name(self):
+        # Get the name that the user wants to search for
+        searchName = self.view.name_input.get().strip().lower()
+        
+        # If the user submits without entering a name
+        if searchName == "":
+            self.view.console_text_output.configure(state='normal')
+            self.view.console_text_output.insert('end',
+                                                'Name filter submitted with no text entered\n')
+            self.view.console_text_output.configure(state='disabled')
+            # Clear the input field
+            self.view.name_input.delete(0, 'end')
+            return
+        # The longest name in the data is 29 characters (including spaces)
+        if (len(searchName) > 29):
+            self.view.console_text_output.configure(state='normal')
+            self.view.console_text_output.insert('end',
+                                                'No results found\n')
+            self.view.console_text_output.configure(state='disabled')
+            # Clear the input field
+            self.view.name_input.delete(0, 'end')
+            # Set the drop-down list to empty
+            self.view.selection_dropdown.configure(values=[])
+            self.view.planet_selection.set("No results found")
+            return
+        
+        # Check the dataset for the specified string
+        else:
+            tempPlanets = [x for x in self.model.planets if searchName in x.name.lower()]
+            
+            if (len(tempPlanets) == 0):
+                self.view.console_text_output.configure(state='normal')
+                self.view.console_text_output.insert('end',
+                                                    'Name filter applied, no results containing \"' + searchName + '\" found\n')
+                self.view.console_text_output.configure(state='disabled')
+                # Clear the input field
+                self.view.name_input.delete(0, 'end')
+                # Set the drop-down list to the filtered list
+                self.view.selection_dropdown.configure(values=tempPlanets)
+                self.view.planet_selection.set("No results found")
+                return
+            else:
+                self.model.filteredPlanets = tempPlanets
+                self.view.console_text_output.configure(state='normal')
+                if (len(tempPlanets) == 1):
+                    self.view.console_text_output.insert('end',
+                                                    'Name filter applied, ' + str(len(tempPlanets)) + ' result containing \"' + searchName + '\" found\n')
+                    # If there is only one result, set the selected planet to that result
+                    self.view.planet_selection.set(tempPlanets[0])
+                else:
+                    self.view.console_text_output.insert('end',
+                                                    'Name filter applied, ' + str(len(tempPlanets)) + ' results containing \"' + searchName + '\" found\n')
+                    self.view.planet_selection.set("Select a planet")
+                self.view.console_text_output.configure(state='disabled')
+                # Clear the input field
+                self.view.name_input.delete(0, 'end')
+                # Set the drop-down list to the filtered list
+                self.view.selection_dropdown.configure(values=tempPlanets)
