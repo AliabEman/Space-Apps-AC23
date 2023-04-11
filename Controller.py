@@ -126,66 +126,6 @@ class Controller:
                 self.view.name_input.delete(0, 'end')
                 # Set the drop-down list to the filtered list
                 self.view.selection_dropdown.configure(values=tempPlanets)
-           # Function to filter the list of planets based on the mass entered by the user
-    def filter_by_mass(self):
-        # Get the mass value  that the user wants to search for
-        massValue = self.view.mass_input.get()
-        
-        # If the user submits entering  empty
-        if massValue == "":
-            self.view.console_text_output.configure(state='normal')
-            self.view.console_text_output.insert('end','Mass filter submitted with no data entered\n')
-            self.view.console_text_output.configure(state='disabled')
-            self.view.mass_input.delete(0, 'end')
-            return
-       
-        # if re.match('^[0-9\.]*$', massValue):
-        # Check if massValue is a valid float value
-        # if re.match('^[0-9]*\.?[0-9]+$', massValue):
-        
-        #This regular expression pattern checks if the massValue variable contains a valid floating point number.
-        if re.match(r'^\d+\.?\d*$', massValue):
-            massValue = float(massValue)
-            self.view.mass_input.delete(0, 'end')
-            self.view.console_text_output.configure(state='normal')
-            self.view.console_text_output.insert('end','This is a good number: ' + str(massValue) + '\n')
-            self.view.console_text_output.configure(state='disabled')
-
-            tempPlanetsMass = [x for x in self.model.planets if float(x.mass) == float(massValue)]
-            if(len(tempPlanetsMass)==0):
-                self.view.console_text_output.configure(state='normal')
-                self.view.console_text_output.insert('end','Did not find any matches for mass: ' + str(massValue) + '\n')
-                self.view.console_text_output.configure(state='disabled')
-            else:
-                self.model.filteredPlanets = tempPlanetsMass
-                self.view.console_text_output.configure(state='normal')
-                if (len(tempPlanetsMass) == 1):
-                    self.view.console_text_output.insert('end','Mass filter applied, ' + str(len(tempPlanetsMass)) + ' result containing \"' + str(massValue) + '\" found\n')
-                else:
-                    self.view.console_text_output.insert('end','Mass filter applied, ' + str(len(tempPlanetsMass)) + ' results containing \"' + str(massValue) + '\" found\n')
-                self.view.console_text_output.configure(state='disabled')
-                # Clear the input field
-                self.view.name_input.delete(0, 'end')
-                # Set the drop-down list to the filtered list
-                self.view.selection_dropdown.configure(values=tempPlanetsMass)
-                # Check if the entered mass matches exactly. 
-                # If it does, set the selected drop-down list item to the matched mass
-                matches = False
-                for planet in tempPlanetsMass:
-                    if (planet.mass == massValue):
-                        self.view.planet_selection.set(planet.name)
-                        matches = True
-                        break
-                # If it doesn't match, set the selected drop-down list item to the default
-                if (matches == False):
-                    self.view.planet_selection.set("Select a planet")
-        else:
-            # The input is not a valid number, display an error message
-            self.view.console_text_output.configure(state='normal')
-            self.view.console_text_output.insert('end','Incorrect datatype please enter numbers.\n')
-            self.view.console_text_output.configure(state='disabled')
-            self.view.mass_input.delete(0, 'end')
-              
              
 
     def filter_by_range(self):
