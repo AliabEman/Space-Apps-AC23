@@ -238,8 +238,7 @@ class View(ttk.Frame):
 
         self.mass_submit_button = tkinter.Button(self.filter_frame, text="Submit", background="green", relief="raised",
                                                  borderwidth=5, highlightthickness=0, highlightbackground="blue",
-                                                 font=submit_font, justify="center",
-                                                 command=self.controller.filter_by_mass)
+                                                 font=submit_font, justify="center")
         self.mass_submit_button.place(relx=0.725, rely=0.67, relwidth=0.2, relheight=0.05)
 
         self.slider_submit_button = tkinter.Button(self.filter_frame, text="Submit", background="green",
