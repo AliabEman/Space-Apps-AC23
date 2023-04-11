@@ -40,7 +40,7 @@ class Controller:
         # grab string value from selection drop down menu
         selected_planet = self.view.selection_dropdown.get()
 
-        if selected_planet == "Select a planet":
+        if selected_planet == "Select a planet" or selected_planet == "No results found":
             self.view.console_text_output.configure(state='normal')
             self.view.console_text_output.insert('end', 'Invalid selection, please choose planet from drop down!\n')
             self.view.console_text_output.configure(state='disabled')
