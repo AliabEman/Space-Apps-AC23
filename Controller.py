@@ -195,7 +195,7 @@ class Controller:
         # If the user submits entering  empty
         if rangeValue == "":
             self.view.console_text_output.configure(state='normal')
-            self.view.console_text_output.insert('end','Mass filter submitted with no data entered\n')
+            self.view.console_text_output.insert('end','Range filter submitted with no data entered\n')
             self.view.console_text_output.configure(state='disabled')
             self.view.mass_input.delete(0, 'end')
             return
@@ -221,9 +221,9 @@ class Controller:
                 self.model.filteredPlanets = tempPlanetsRange
                 self.view.console_text_output.configure(state='normal')
                 if (len(tempPlanetsRange) == 1):
-                    self.view.console_text_output.insert('end','Mass filter applied, ' + str(len(tempPlanetsRange)) + ' result containing \"' + str(rangeValue) + '\" found\n')
+                    self.view.console_text_output.insert('end','Range filter applied, ' + str(len(tempPlanetsRange)) + ' result containing \"' + str(rangeValue) + '\" found\n')
                 else:
-                    self.view.console_text_output.insert('end','Mass filter applied, ' + str(len(tempPlanetsRange)) + ' results containing \"' + str(rangeValue) + '\" found\n')
+                    self.view.console_text_output.insert('end','Range filter applied, ' + str(len(tempPlanetsRange)) + ' results containing \"' + str(rangeValue) + '\" found\n')
                 self.view.console_text_output.configure(state='disabled')
                 # Clear the input field
                 self.view.name_input.delete(0, 'end')
