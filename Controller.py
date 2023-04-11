@@ -1,3 +1,6 @@
+import sys
+
+
 class Controller:
     def __init__(self, model, view):
         self.model = model
@@ -53,34 +56,52 @@ class Controller:
         test = selected_planet
 
     def get_filtered_planet_mass(self):
-        self.inputted_mass= 0
+        self.inputted_mass = 0
         self.filtered_mass = []
-        print(self.model.smallest_planet.mass)
+        #print(self.model.smallest_planet.mass)
         try:
+            self.inputted_mass_string = self.view.mass_input.get()
+            #print(self.inputted_mass_string)
             self.inputted_mass = float(self.view.mass_input.get())
-            print("Decimal number inputted!!!")
+            #print("Decimal number inputted!!!")
             print(type(self.inputted_mass))
-        except ValueError:
-            self.view.console_text_output.configure(state='normal')
-            self.view.console_text_output.insert('end', '********* Please enter a number only *********\n')
-            self.view.console_text_output.configure(state='disabled')
-            print("Input number only!!!!!!")
-        if self.inputted_mass != 0 and float(self.view.mass_input.get()) >= self.model.smallest_planet.mass:
-            self.view.console_text_output.configure(state='normal')
-            self.view.console_text_output.insert('end', '********* Filter Applied for Mass *********\n')
-            for planet in self.model.planets:
-                if planet.mass < self.inputted_mass:
-                    self.filtered_mass.append([planet.name, planet.mass, planet.distance])
-                    self.view.console_text_output.insert('end', ' '+str(planet.name)+' - '+str(planet.mass)+' - '+str(planet.distance)+'\n')
-            self.view.console_text_output.configure(state='disabled')
-            if len(self.filtered_mass) == 0:
+            if 0 < self.inputted_mass < sys.float_info.max and float(self.view.mass_input.get()) >= self.model.smallest_planet.mass:
                 self.view.console_text_output.configure(state='normal')
-                self.view.console_text_output.insert('end','********* No Results found *********\n')
+                self.view.console_text_output.insert('end', '********* Mass filter applied *********\n')
+                for planet in self.model.planets:
+                    if planet.mass < self.inputted_mass:
+                        self.filtered_mass.append([planet.name, planet.mass, planet.distance])
+                        self.view.console_text_output.insert('end', ' ' + str(planet.name) + ' - ' + str(
+                            planet.mass) + ' - ' + str(planet.distance) + '\n')
+                # self.view.console_text_output.insert('end',"************** Printing Original Data Explicitly ************\n")
+                # for planet in self.model.planets:
+                #         self.filtered_mass.append([planet.name, planet.mass, planet.distance])
+                #         self.view.console_text_output.insert('end', ' ' + str(planet.name) + ' - ' + str(
+                #             planet.mass) + ' - ' + str(planet.distance) + '\n')
+                # self.view.console_text_output.configure(state='disabled')
+                if len(self.filtered_mass) == 0:
+                    self.view.console_text_output.configure(state='normal')
+                    self.view.console_text_output.insert('end', '********* No Results found *********\n')
+                    self.view.console_text_output.configure(state='disabled')
+            elif self.inputted_mass >= sys.float_info.max:
+                self.view.console_text_output.configure(state='normal')
+                self.view.console_text_output.insert('end', '********* Mass input exceeeds system maximums *********\n')
                 self.view.console_text_output.configure(state='disabled')
-        else:
-            self.view.console_text_output.configure(state='normal')
-            self.view.console_text_output.insert('end','********* Value inserted is too small, Please insert it again ********* \n')
-            self.view.console_text_output.configure(state='disabled')
+            else:
+                self.view.console_text_output.configure(state='normal')
+                self.view.console_text_output.insert('end',
+                                                     '********* Value inserted is too small ********* \n')
+                self.view.console_text_output.configure(state='disabled')
+        except ValueError:
+            if not self.inputted_mass_string:
+                self.view.console_text_output.configure(state='normal')
+                self.view.console_text_output.insert('end','********* Mass Filter Cannot be Null *********\n')
+                self.view.console_text_output.configure(state='disabled')
+            else:
+                self.view.console_text_output.configure(state='normal')
+                self.view.console_text_output.insert('end', '********* Please enter a number only *********\n')
+                self.view.console_text_output.configure(state='disabled')
+                print("Input number only!!!!!!")
 
 
 
