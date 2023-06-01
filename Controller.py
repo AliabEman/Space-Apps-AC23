@@ -1,4 +1,6 @@
 import re
+
+
 class Controller:
     def __init__(self, model, view):
         self.model = model
@@ -66,17 +68,17 @@ class Controller:
         self.view.console_text_output.insert('end',
                                              'Efficiency index of calculation set to ' + str(efficiency_value) + '\n')
         self.view.console_text_output.configure(state='disabled')
-        
+
     # Function to filter the list of planets based on the name entered by the user
     def filter_by_name(self):
         # Get the name that the user wants to search for
         searchName = self.view.name_input.get().strip().lower()
-        
+
         # If the user submits without entering a name
         if searchName == "":
             self.view.console_text_output.configure(state='normal')
             self.view.console_text_output.insert('end',
-                                                'Name filter submitted with no text entered\n')
+                                                 'Name filter submitted with no text entered\n')
             self.view.console_text_output.configure(state='disabled')
             # Clear the input field
             self.view.name_input.delete(0, 'end')
@@ -85,7 +87,7 @@ class Controller:
         if (len(searchName) > 29):
             self.view.console_text_output.configure(state='normal')
             self.view.console_text_output.insert('end',
-                                                'No results found\n')
+                                                 'No results found\n')
             self.view.console_text_output.configure(state='disabled')
             # Clear the input field
             self.view.name_input.delete(0, 'end')
@@ -93,15 +95,15 @@ class Controller:
             self.view.selection_dropdown.configure(values=[])
             self.view.planet_selection.set("No results found")
             return
-        
+
         # Check the dataset for the specified string
         else:
             tempPlanets = [x for x in self.model.planets if searchName in x.name.lower()]
-            
+
             if (len(tempPlanets) == 0):
                 self.view.console_text_output.configure(state='normal')
                 self.view.console_text_output.insert('end',
-                                                    'Name filter applied, no results containing \"' + searchName + '\" found\n')
+                                                     'Name filter applied, no results containing \"' + searchName + '\" found\n')
                 self.view.console_text_output.configure(state='disabled')
                 # Clear the input field
                 self.view.name_input.delete(0, 'end')
@@ -114,56 +116,60 @@ class Controller:
                 self.view.console_text_output.configure(state='normal')
                 if (len(tempPlanets) == 1):
                     self.view.console_text_output.insert('end',
-                                                    'Name filter applied, ' + str(len(tempPlanets)) + ' result containing \"' + searchName + '\" found\n')
+                                                         'Name filter applied, ' + str(
+                                                             len(tempPlanets)) + ' result containing \"' + searchName + '\" found\n')
                     # If there is only one result, set the selected planet to that result
                     self.view.planet_selection.set(tempPlanets[0])
                 else:
                     self.view.console_text_output.insert('end',
-                                                    'Name filter applied, ' + str(len(tempPlanets)) + ' results containing \"' + searchName + '\" found\n')
+                                                         'Name filter applied, ' + str(
+                                                             len(tempPlanets)) + ' results containing \"' + searchName + '\" found\n')
                     self.view.planet_selection.set("Select a planet")
                 self.view.console_text_output.configure(state='disabled')
                 # Clear the input field
                 self.view.name_input.delete(0, 'end')
                 # Set the drop-down list to the filtered list
                 self.view.selection_dropdown.configure(values=tempPlanets)
-             
 
     def filter_by_range(self):
         # Get the mass value  that the user wants to search for
         rangeValue = self.view.range_input.get()
-        
+
         # If the user submits entering  empty
         if rangeValue == "":
             self.view.console_text_output.configure(state='normal')
-            self.view.console_text_output.insert('end','Range filter submitted with no data entered\n')
+            self.view.console_text_output.insert('end', 'Range filter submitted with no data entered\n')
             self.view.console_text_output.configure(state='disabled')
             self.view.mass_input.delete(0, 'end')
             return
-       
+
         # if re.match('^[0-9\.]*$', rangeValue):
         # Check if rangeValue is a valid float value
         # if re.match('^[0-9]*\.?[0-9]+$', rangeValue):
-        
-        #This regular expression pattern checks if the rangeValue variable contains a valid floating point number.
+
+        # This regular expression pattern checks if the rangeValue variable contains a valid floating point number.
         if re.match(r'^\d+\.?\d*$', rangeValue):
             rangeValue = float(rangeValue)
             self.view.mass_input.delete(0, 'end')
             self.view.console_text_output.configure(state='normal')
-            self.view.console_text_output.insert('end','Valid number entered!: ' + str(rangeValue) + '\n')
+            self.view.console_text_output.insert('end', 'Valid number entered!: ' + str(rangeValue) + '\n')
             self.view.console_text_output.configure(state='disabled')
 
             tempPlanetsRange = [x for x in self.model.planets if float(x.distance) == float(rangeValue)]
-            if(len(tempPlanetsRange)==0):
+            if (len(tempPlanetsRange) == 0):
                 self.view.console_text_output.configure(state='normal')
-                self.view.console_text_output.insert('end','Did not find any matches for range: ' + str(rangeValue) + '\n')
+                self.view.console_text_output.insert('end',
+                                                     'Did not find any matches for range: ' + str(rangeValue) + '\n')
                 self.view.console_text_output.configure(state='disabled')
             else:
                 self.model.filteredPlanets = tempPlanetsRange
                 self.view.console_text_output.configure(state='normal')
                 if (len(tempPlanetsRange) == 1):
-                    self.view.console_text_output.insert('end','Range filter applied, ' + str(len(tempPlanetsRange)) + ' result containing \"' + str(rangeValue) + '\" found\n')
+                    self.view.console_text_output.insert('end', 'Range filter applied, ' + str(
+                        len(tempPlanetsRange)) + ' result containing \"' + str(rangeValue) + '\" found\n')
                 else:
-                    self.view.console_text_output.insert('end','Range filter applied, ' + str(len(tempPlanetsRange)) + ' results containing \"' + str(rangeValue) + '\" found\n')
+                    self.view.console_text_output.insert('end', 'Range filter applied, ' + str(
+                        len(tempPlanetsRange)) + ' results containing \"' + str(rangeValue) + '\" found\n')
                 self.view.console_text_output.configure(state='disabled')
                 # Clear the input field
                 self.view.name_input.delete(0, 'end')
@@ -183,8 +189,8 @@ class Controller:
         else:
             # The input is not a valid number, display an error message
             self.view.console_text_output.configure(state='normal')
-            self.view.console_text_output.insert('end','Incorrect datatype please enter numbers.\n')
+            self.view.console_text_output.insert('end', 'Incorrect datatype please enter numbers.\n')
             self.view.console_text_output.configure(state='disabled')
             self.view.range_input.delete(0, 'end')
-              
-                # print("Error: Incorrect data type. Please enter a valid number.")  
+
+            # print("Error: Incorrect data type. Please enter a valid number.")

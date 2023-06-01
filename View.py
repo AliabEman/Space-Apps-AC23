@@ -1,8 +1,9 @@
 import tkinter
 from tkinter import ttk, PhotoImage, scrolledtext
-
 import pygame as pygame
 from PIL import Image, ImageTk
+from ffpyplayer.player import MediaPlayer
+import cv2
 
 
 # View class Main Layout and Widgets of GUI
@@ -35,8 +36,6 @@ class View(ttk.Frame):
         self.HEIGHT = self.winfo_screenheight() - 100
 
         # define the layout frame sizes
-        # for some reason the console frame is not sizing correctly, I managed to force it by sizing the TEXT area
-        # but this is a work around not a solution
         self.MENU_FRAME_WIDTH = self.WIDTH // 4
         self.CONSOLE_FRAME_HEIGHT = self.HEIGHT // 5
         self.FILTER_FRAME_WIDTH = self.WIDTH - self.MENU_FRAME_WIDTH
@@ -165,6 +164,16 @@ class View(ttk.Frame):
 
         quit_button.place(relx=0.1, rely=0.18, relwidth=0.25, relheight=0.08)
 
+        # create tutorial button
+        tutorial_button = tkinter.Button(self.menu_frame, text="Tutorial", bd=3, relief="raised",
+                                         borderwidth=5, highlightthickness=0,
+                                         highlightbackground="blue",
+                                         font=("Arial", 20, "bold"),
+                                         background="green",
+                                         command=self.play_tutorial
+                                         )
+        tutorial_button.place(relx=0.6, rely=0.18, relwidth=0.3, relheight=0.08)
+
         # create calculate button
         calculate_button = tkinter.Button(self.menu_frame, text="Calculate", bd=3, relief="raised",
                                           borderwidth=5, highlightthickness=0,
@@ -178,7 +187,7 @@ class View(ttk.Frame):
 
         # //// FILTER WIDGETS /////////////////////////////////////////////////////////////////////////////////////////
 
-        # this is super janky because python fucking blows, The spaced strings are to line up the words
+        # this is spaced due to pythons desire to ratio everything, the spacing will line up the labels
         planet_name_label = "Planet Name"
         planet_mass_label = "       Planet Max Mass"
         planet_range_label = "         Planet Max Range"
@@ -295,3 +304,56 @@ class View(ttk.Frame):
                 pygame.display.flip()
 
             pygame.quit()
+
+    # View method to instantiate a media player and playback video capture / audio using the cv2 library for the
+    # purposes of the SandGlass in application tutorial video
+    @staticmethod
+    def play_tutorial():
+
+        # define pathing for the desired Mp4 video in project directory
+        video_path = "videos/tutorial.mp4"
+
+        # assign the file to the video capture class in order to pull frames of the video file
+        video = cv2.VideoCapture(video_path)
+        # instantiate ffpyplayer media player object for audio video playback
+        player = MediaPlayer(video_path)
+
+        # define the video player window parameters
+        window_size = (1200, 800)
+        cv2.namedWindow("SandGlass Tutorial", cv2.WINDOW_NORMAL)
+        cv2.resizeWindow("SandGlass Tutorial", window_size)
+
+        # infinite loop for video playback
+        while True:
+
+            # select next video and audio frame from video file
+            grabbed, frame = video.read()
+            audio_frame, val = player.get_frame()
+
+            # if no frames exist the video file is finished exit playback
+            if not grabbed:
+                break
+
+            # define framerate of playback to synchronize audio and video frames
+            if cv2.waitKey(39) & 0xFF == ord("q"):
+                break
+
+            # detection conditions for manual 'QUIT' of the tutorial video
+            try:
+                # if property returns -1 the window has closed this will throw a benign exception
+                # so break the playback loop inside the exception catch
+                if cv2.getWindowProperty("SandGlass Tutorial", 1) == -1:
+                    break
+            except Exception as e:
+                break
+
+            # display current frame to media player window frame
+            cv2.imshow("SandGlass Tutorial", frame)
+
+            if val != 'eof' and audio_frame is not None:
+                img, t = audio_frame
+
+        # release and close Video / Audio / Playback components
+        video.release()
+        player.close_player()
+        cv2.destroyAllWindows()

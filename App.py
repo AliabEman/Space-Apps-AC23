@@ -118,7 +118,7 @@ class App(tk.Tk):
             return nasa_data_frame  # Function end
 
         # read all data from CSV
-        csvName = "Dev_Test_Set.csv"
+        csvName = "NASA_PRODUCTION.csv"
         nasa_data_frame = pandas.read_csv(csvName)
 
         # check if the name column is already in the correct location
