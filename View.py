@@ -4,6 +4,8 @@ import pygame as pygame
 from PIL import Image, ImageTk
 from ffpyplayer.player import MediaPlayer
 import cv2
+import math # Addition for PyGame.
+import Planet_Simulation
 
 
 # View class Main Layout and Widgets of GUI
@@ -185,6 +187,18 @@ class View(ttk.Frame):
 
         calculate_button.place(relx=0.1, rely=0.85, relwidth=0.8, relheight=0.05)
 
+        # create Simulation button: Problem at hand:
+        # 1- Need to change the trajectories displayed by the Planet objects created using Dylan's calculations
+        simulation_button = tkinter.Button(self.menu_frame, text="Simulate", bd=3, relief="raised",
+                                          borderwidth=5, highlightthickness=0,
+                                          highlightbackground="blue",
+                                          font=("Arial", 20, "bold"),
+                                          background="green",
+                                          command=self.create_simulation_screen
+                                          )
+
+        simulation_button.place(relx=0.1, rely=0.75, relwidth=0.8, relheight=0.05)
+
         # //// FILTER WIDGETS /////////////////////////////////////////////////////////////////////////////////////////
 
         # this is spaced due to pythons desire to ratio everything, the spacing will line up the labels
@@ -285,25 +299,21 @@ class View(ttk.Frame):
                                                                                               selected_planet.mass,
                                                                                               efficiency_index)
             # define the window
+            
+
+    # instantiate a pygame window for the purposes of visualization. This could change over development time
+    def create_simulation_screen(self):
+        # retrieve planet from model
+        selected_planet = self.controller.get_selected_planet()
+        efficiency_index = self.controller.get_efficiency_index()
+
+        # ensure planet was passed, if object does not exist stop function and do not instantiate pygame
+        if selected_planet is None:
+            return
+        else:
             pygame.init()
-            screen = pygame.display.set_mode((800, 800))
-            pygame.display.set_caption("SandGlass Visualizer")
-
-            # define the text for display test
-            font = pygame.font.SysFont("Arial", 20)
-            text_render = font.render(text, True, (255, 255, 255))
-
-            # Pygame loop
-            running = True
-            while running:
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        running = False
-
-                screen.blit(text_render, (10, 10))
-                pygame.display.flip()
-
-            pygame.quit()
+            Planet_Simulation.main()
+            pygame.quit()            
 
     # View method to instantiate a media player and playback video capture / audio using the cv2 library for the
     # purposes of the SandGlass in application tutorial video
