@@ -1,11 +1,10 @@
+import subprocess
 import tkinter
 from tkinter import ttk, PhotoImage, scrolledtext
 import pygame as pygame
 from PIL import Image, ImageTk
 from ffpyplayer.player import MediaPlayer
 import cv2
-import math # Addition for PyGame.
-import Planet_Simulation
 
 
 # View class Main Layout and Widgets of GUI
@@ -187,18 +186,6 @@ class View(ttk.Frame):
 
         calculate_button.place(relx=0.1, rely=0.85, relwidth=0.8, relheight=0.05)
 
-        # create Simulation button: Problem at hand:
-        # 1- Need to change the trajectories displayed by the Planet objects created using Dylan's calculations
-        simulation_button = tkinter.Button(self.menu_frame, text="Simulate", bd=3, relief="raised",
-                                          borderwidth=5, highlightthickness=0,
-                                          highlightbackground="blue",
-                                          font=("Arial", 20, "bold"),
-                                          background="green",
-                                          command=self.create_simulation_screen
-                                          )
-
-        simulation_button.place(relx=0.1, rely=0.75, relwidth=0.8, relheight=0.05)
-
         # //// FILTER WIDGETS /////////////////////////////////////////////////////////////////////////////////////////
 
         # this is spaced due to pythons desire to ratio everything, the spacing will line up the labels
@@ -288,32 +275,21 @@ class View(ttk.Frame):
         selected_planet = self.controller.get_selected_planet()
         efficiency_index = self.controller.get_efficiency_index()
 
+        sec_mass=selected_planet.mass
+        sec_distance=selected_planet.distance
+
+
+
         # ensure planet was passed, if object does not exist stop function and do not instantiate pygame
         if selected_planet is None:
             return
         else:
-
-            # define some test data to display
-            text = "Selected Planet values: Name={}, Range={}, mass={} Efficiency: {}".format(selected_planet.name,
-                                                                                              selected_planet.distance,
-                                                                                              selected_planet.mass,
-                                                                                              efficiency_index)
-            # define the window
+            # Retrieve the parameters you want to send
+             subprocess.Popen(['python', 'pyGameTest.py', str(selected_planet),str(efficiency_index),str(sec_mass),str(sec_distance)])
             
+            
+    
 
-    # instantiate a pygame window for the purposes of visualization. This could change over development time
-    def create_simulation_screen(self):
-        # retrieve planet from model
-        selected_planet = self.controller.get_selected_planet()
-        efficiency_index = self.controller.get_efficiency_index()
-
-        # ensure planet was passed, if object does not exist stop function and do not instantiate pygame
-        if selected_planet is None:
-            return
-        else:
-            pygame.init()
-            Planet_Simulation.main()
-            pygame.quit()            
 
     # View method to instantiate a media player and playback video capture / audio using the cv2 library for the
     # purposes of the SandGlass in application tutorial video
