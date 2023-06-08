@@ -131,7 +131,7 @@ class View(ttk.Frame):
         self.console_text_output.configure(state='disabled')
 
         # create the clear filters button, stylize it and attach it to controller action
-        clear_filter_button = tkinter.Button(self.console_frame, text="clear Filters", bg="#9A9AC0", fg="black",
+        clear_filter_button = tkinter.Button(self.console_frame, text="Clear filters", bg="#9A9AC0", fg="black",
                                              font=("Arial", 20),
                                              bd=3,
                                              relief="raised",
@@ -152,7 +152,7 @@ class View(ttk.Frame):
                                                values=self.controller.get_planets(),
                                                height=20, state="readonly")
         self.selection_dropdown.config(font=('Arial', 12), background="white", justify='center')
-        self.selection_dropdown.place(relx=0.5, rely=0.30, relwidth=0.8, relheight=0.05, anchor='n')
+        self.selection_dropdown.place(relx=0.5, rely=0.30, relwidth=0.9, relheight=0.05, anchor='n')
 
         # create quit button
         quit_button = tkinter.Button(self.menu_frame, text="Quit", bd=3, relief="raised",
@@ -162,7 +162,16 @@ class View(ttk.Frame):
                                      background="red",
                                      command=self.parent.destroy)
 
-        quit_button.place(relx=0.1, rely=0.18, relwidth=0.25, relheight=0.08)
+        quit_button.place(relx=0.05, rely=0.18, relwidth=0.25, relheight=0.08)
+        
+        # create about button
+        about_button = tkinter.Button(self.menu_frame, text="About", bd=3, relief="raised",
+                                      borderwidth=5, highlightthickness=0,
+                                      highlightbackground="blue",
+                                      font=("Arial", 20, "bold"),
+                                      background="green",
+                                      command=self.controller.about_app)
+        about_button.place(relx=0.35, rely=0.18, relwidth=0.25, relheight=0.08)
 
         # create tutorial button
         tutorial_button = tkinter.Button(self.menu_frame, text="Tutorial", bd=3, relief="raised",
@@ -172,8 +181,8 @@ class View(ttk.Frame):
                                          background="green",
                                          command=self.play_tutorial
                                          )
-        tutorial_button.place(relx=0.6, rely=0.18, relwidth=0.3, relheight=0.08)
-
+        tutorial_button.place(relx=0.65, rely=0.18, relwidth=0.3, relheight=0.08)
+        
         # create calculate button
         calculate_button = tkinter.Button(self.menu_frame, text="Calculate", bd=3, relief="raised",
                                           borderwidth=5, highlightthickness=0,
@@ -183,7 +192,7 @@ class View(ttk.Frame):
                                           command=self.create_visualization_screen
                                           )
 
-        calculate_button.place(relx=0.1, rely=0.85, relwidth=0.8, relheight=0.05)
+        calculate_button.place(relx=0.05, rely=0.85, relwidth=0.9, relheight=0.05)
 
         # //// FILTER WIDGETS /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -357,3 +366,4 @@ class View(ttk.Frame):
         video.release()
         player.close_player()
         cv2.destroyAllWindows()
+        

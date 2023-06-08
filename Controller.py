@@ -1,5 +1,5 @@
 import re
-
+import pygame as pygame
 
 class Controller:
     def __init__(self, model, view):
@@ -130,6 +130,8 @@ class Controller:
                 self.view.name_input.delete(0, 'end')
                 # Set the drop-down list to the filtered list
                 self.view.selection_dropdown.configure(values=tempPlanets)
+                
+    # END Filter by name function
 
     def filter_by_range(self):
         # Get the mass value  that the user wants to search for
@@ -194,3 +196,47 @@ class Controller:
             self.view.range_input.delete(0, 'end')
 
             # print("Error: Incorrect data type. Please enter a valid number.")
+
+    # Function that creates a window with the "about" information of the application
+    def about_app(self):
+        # define the window
+        pygame.init()
+        screen = pygame.display.set_mode((800, 500))
+        pygame.display.set_caption("About the Application")
+        
+        # Function that will send text to the next line when it finds a \n (since pygame can't process them)
+        def process_newlines(text_to_split):
+            # Create a list where every element is a line of text up to a newline character. Deletes the newline character
+            split_text = text.split('\n')
+            
+            # Create a list of surfaces, where each surface in the list is one line of text
+            surfaces = []
+            for sentence in split_text:
+                new_surface = font.render(sentence, True, (255, 255, 255))
+                surfaces.append(new_surface)
+            return surfaces
+        
+        # Define the text to display
+        font = pygame.font.SysFont("Arial", 20)
+        text = "Authors:\nAlexander Lapierre\nAliab Eman\nDylan Carroll\nGreg Rowat\nJay Patel\nSavas Erturk\n\n"
+        text += "This app has been created for the NASA SpaceApps Competition!"
+        text += "\n\nDev note: More text will be added here to define the algorithm"
+        
+        # Create an array that will store the lines that fit into the window
+        formatted_text = process_newlines(text)
+
+        # Pygame loop
+        running = True
+        while running:
+            yPosition = 10
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+
+            # Print each surface in the list
+            for surface in formatted_text:
+                screen.blit(surface, (10, yPosition))
+                position += 20 # Increment the y position for blit so each surface prints on a new line
+            pygame.display.flip()
+
+        pygame.quit()
