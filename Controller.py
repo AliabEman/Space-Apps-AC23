@@ -207,7 +207,7 @@ class Controller:
         # Function that will send text to the next line when it finds a \n (since pygame can't process them)
         def process_newlines(text_to_split):
             # Create a list where every element is a line of text up to a newline character. Deletes the newline character
-            split_text = text.split('\n')
+            split_text = text_to_split.split('\n')
             
             # Create a list of surfaces, where each surface in the list is one line of text
             surfaces = []
@@ -236,7 +236,7 @@ class Controller:
             # Print each surface in the list
             for surface in formatted_text:
                 screen.blit(surface, (10, yPosition))
-                position += 20 # Increment the y position for blit so each surface prints on a new line
+                yPosition += 20 # Increment the y position for blit so each surface prints on a new line
             pygame.display.flip()
 
         pygame.quit()
