@@ -49,7 +49,7 @@ class Model:
             })
             distance += step  # the distance will increase by the step amount each iteration
             t += time_taken  # building to total time this has taken
-        print(data)  # print out list within measured time
+        #print(data)  # print out list within measured time
         end_time = time.time()  # Stop the timer
         calc = end_time - start_time
         #  Send the value in years to a formatter function
