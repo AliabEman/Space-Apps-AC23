@@ -180,7 +180,7 @@ class View(ttk.Frame):
                                           highlightbackground="blue",
                                           font=("Arial", 20, "bold"),
                                           background="green",
-                                          command=self.create_visualization_screen
+                                          command=self.controller.start_algorithm
                                           )
 
         calculate_button.place(relx=0.1, rely=0.85, relwidth=0.8, relheight=0.05)
@@ -269,10 +269,13 @@ class View(ttk.Frame):
         self.controller = controller
 
     # instantiate a pygame window for the purposes of visualization. This could change over development time
-    def create_visualization_screen(self):
+    def create_visualization_screen(self, model, t, calc, starting_velocity, algorithm_results):
         # retrieve planet from model
         selected_planet = self.controller.get_selected_planet()
         efficiency_index = self.controller.get_efficiency_index()
+
+        #  show what is available for visualizing here in the view
+        #print(algorithm_results)
 
         # ensure planet was passed, if object does not exist stop function and do not instantiate pygame
         if selected_planet is None:
@@ -280,10 +283,15 @@ class View(ttk.Frame):
         else:
 
             # define some test data to display
-            text = "Selected Planet values: Name={}, Range={}, mass={} Efficiency: {}".format(selected_planet.name,
-                                                                                              selected_planet.distance,
-                                                                                              selected_planet.mass,
-                                                                                              efficiency_index)
+            text = "Selected Planet values:\n Name={}, Range={},mass={} Efficiency: {}\n\nAlgorithm Results\n\nExpansion Time: {}\nCalculation Time: {} Seconds\nStarting Velocity: {} km/s".format(
+                selected_planet.name,
+                selected_planet.distance,
+                selected_planet.mass,
+                efficiency_index,
+                t,
+                calc,
+                starting_velocity)
+
             # define the window
             pygame.init()
             screen = pygame.display.set_mode((800, 800))
@@ -291,7 +299,11 @@ class View(ttk.Frame):
 
             # define the text for display test
             font = pygame.font.SysFont("Arial", 20)
+            line_height = font.get_linesize()
             text_render = font.render(text, True, (255, 255, 255))
+
+            # split the text into lines
+            lines = text.split("\n")
 
             # Pygame loop
             running = True
@@ -300,7 +312,13 @@ class View(ttk.Frame):
                     if event.type == pygame.QUIT:
                         running = False
 
-                screen.blit(text_render, (10, 10))
+                # clear the screen
+                screen.fill((0, 0, 0))
+
+                for i in range(len(lines)):
+                    line_render = font.render(lines[i], True, (255, 255, 255))
+                    screen.blit(line_render, (10, 10 + i * line_height))
+
                 pygame.display.flip()
 
             pygame.quit()

@@ -9,6 +9,11 @@ class Controller:
     def get_planets(self):
         return self.model.filteredPlanets
 
+    def start_algorithm(self):
+            print("validate button modification")
+            selected_planet = self.get_selected_planet()
+            self.model.run_algorithm(self, selected_planet)
+            
     def clear_filters(self):
 
         # test = ["test1", "test2", "test3"]
@@ -53,7 +58,40 @@ class Controller:
                 if planet.name == selected_planet:
                     selected_planet = planet
                     return selected_planet
-
+    #  function to take in a value in years, and convert it in a way appropriate to display
+    #  returns string holding time with appropriate units
+    @staticmethod
+    def convert_time_unit(temp, time_in_years):
+        if time_in_years < 1:
+            time_in_months = time_in_years * 12
+            if time_in_months < 1:
+                time_in_days = time_in_months * 30
+                if time_in_days < 1:
+                    time_in_hours = time_in_days * 24
+                    if time_in_hours < 1:
+                        time_in_seconds = time_in_hours * 3600
+                        return f"{time_in_seconds:.5f} seconds"
+                    else:
+                        return f"{time_in_hours:.5f} hours"
+                else:
+                    return f"{time_in_days:.5f} days"
+            else:
+                return f"{time_in_months:.5f} months"
+        elif 1 <= time_in_years < 1000:
+            return f"{time_in_years:.5f} years"
+        elif 1000 <= time_in_years < 1000000:
+            time_in_thousands_of_years = time_in_years / 1000
+            return f"{time_in_thousands_of_years:.5f} thousand years"
+        elif 1000000 <= time_in_years < 1000000000:
+            time_in_millions_of_years = time_in_years / 1000000
+            return f"{time_in_millions_of_years:.5f} million years"
+        elif time_in_years >= 1000000000:
+            time_in_billions_of_years = time_in_years / 1000000000
+            return f"{time_in_billions_of_years:.5f} billion years"
+        elif time_in_years >= 1000000000000:
+            time_in_trillions_of_years = time_in_years / 1000000000000
+            return f"{time_in_trillions_of_years:.5f} trillion years"
+        
     def get_efficiency_index(self):
         return self.model.efficiency_index
 
