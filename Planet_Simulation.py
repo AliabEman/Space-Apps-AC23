@@ -165,8 +165,7 @@ if __name__ == '__main__':
     # We dont draw the distance to sun from sun, and orbit from sun, recall sun boolean
     sun.sun = True
     
-    testPlanet = Planet(-1.524 * Planet.AU, 0, 12, RED, (int(mass)/10000) * 10 **26)
-    testPlanet.y_vel = 24.077 * 1000
+
 
     earth = Planet(-1 * Planet.AU, 0, 16, BLUE, 5.9742 * 10**24)
     earth.y_vel = 29.783 *1000
@@ -181,7 +180,7 @@ if __name__ == '__main__':
     venus.y_vel = -35.02 * 1000
     
     # Create a list of planets
-    planets = [sun, earth, mars, mercury, venus,testPlanet]
+    planets = [sun, earth, mars, mercury, venus]
 
 
     # Infinite loop to keep program running instead of instantly closing
@@ -193,7 +192,7 @@ if __name__ == '__main__':
         WIN.fill((0,0,0))
         text_render = FONT.render(text, True, (255, 255, 255))
  
-        WIN.screen.blit(text_render, (10, 10))
+        WIN.blit(text_render, (10, 10))
         pygame.display.flip()    
 
         # Get the different events occuring in the pygame
