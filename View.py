@@ -285,7 +285,7 @@ class View(ttk.Frame):
             return
         else:
             # Retrieve the parameters you want to send
-             subprocess.Popen(['python', 'pyGameTest.py', str(selected_planet),str(efficiency_index),str(sec_mass),str(sec_distance)])
+             subprocess.Popen(['python', 'Planet_Simulation.py', str(selected_planet),str(efficiency_index),str(sec_mass),str(sec_distance)])
             
             
     
