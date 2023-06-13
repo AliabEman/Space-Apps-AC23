@@ -1,4 +1,8 @@
 import re
+import sys
+from tkinter import END
+
+
 class Controller:
     def __init__(self, model, view):
         self.model = model
@@ -84,8 +88,7 @@ class Controller:
         # The longest name in the data is 29 characters (including spaces)
         if (len(searchName) > 29):
             self.view.console_text_output.configure(state='normal')
-            self.view.console_text_output.insert('end',
-                                                'No results found\n')
+            self.view.console_text_output.insert('end', 'No results found\n')
             self.view.console_text_output.configure(state='disabled')
             # Clear the input field
             self.view.name_input.delete(0, 'end')
@@ -96,7 +99,7 @@ class Controller:
         
         # Check the dataset for the specified string
         else:
-            tempPlanets = [x for x in self.model.planets if searchName in x.name.lower()]
+            tempPlanets = [x for x in self.model.filteredPlanets if searchName in x.name.lower()]
             
             if (len(tempPlanets) == 0):
                 self.view.console_text_output.configure(state='normal')
@@ -126,7 +129,6 @@ class Controller:
                 self.view.name_input.delete(0, 'end')
                 # Set the drop-down list to the filtered list
                 self.view.selection_dropdown.configure(values=tempPlanets)
-             
 
     def filter_by_range(self):
         # Get the mass value  that the user wants to search for
@@ -187,4 +189,313 @@ class Controller:
             self.view.console_text_output.configure(state='disabled')
             self.view.range_input.delete(0, 'end')
               
-                # print("Error: Incorrect data type. Please enter a valid number.")  
+                # print("Error: Incorrect data type. Please enter a valid number.")
+    def get_filtered_distance(self):
+        self.filtered_distance = []
+        self.filtered_distance_string = []
+        try:
+            self.inputted_distance_string = self.view.range_input.get()
+            self.inputted_distance = float(self.view.range_input.get())
+            if self.inputted_distance > 0:
+                self.view.console_text_output.configure(state='normal')
+                for planet in self.model.filteredPlanets:
+                    if hasattr(planet, 'distance') and float(planet.distance) < self.inputted_distance:
+                        self.filtered_distance_string.append([planet.name, planet.mass, planet.distance])
+                        self.filtered_distance.append(planet.name)
+
+                if(len(self.filtered_distance_string) == 0):
+                    self.view.console_text_output.configure(state='normal')
+                    self.view.console_text_output.insert('end',
+                                                         'Range filter applied, no results containing \"' + self.inputted_distance_string + '\" found\n')
+                    self.view.console_text_output.configure(state='disabled')
+                    self.view.name_input.delete(0, 'end')
+                    self.view.selection_dropdown.configure(values=self.filtered_distance_string)
+                    self.view.planet_selection.set("No results found")
+                else:
+                    self.model.filteredPlanets = self.filtered_distance_string
+                    self.view.console_text_output.configure(state='normal')
+                    if (len(self.filtered_distance_string) == 1):
+                        self.view.console_text_output.insert('end',
+                                                             'Name filter applied, ' + str(
+                                                                 len(self.filtered_distance_string)) + ' result containing \"' + self.inputted_distance_string + '\" found\n')
+                        # If there is only one result, set the selected planet to that result
+                        self.view.planet_selection.set(self.filtered_distance_string[0])
+                    else:
+                        self.view.console_text_output.insert('end',
+                                                             'Name filter applied, ' + str(
+                                                                 len(self.filtered_distance_string)) + ' results containing \"' + self.inputted_distance_string + '\" found\n')
+                        self.view.planet_selection.set("Select a planet")
+                    self.view.console_text_output.configure(state='disabled')
+                    # Clear the input field
+                    self.view.name_input.delete(0, 'end')
+                    # Set the drop-down list to the filtered list
+                    self.view.selection_dropdown.configure(values=self.filtered_distance_string)
+
+                # self.model.filteredPlanets = self.filtered_distance_string
+                # self.view.selection_dropdown.configure(values=self.filtered_distance)
+                # self.model.filteredPlanets = self.inputted_distance_string
+                # self.model.filteredPlanets= self.inputted_distance_string
+                # self.view.range_input.delete(0, END)
+                # self.model.filteredPlanets.clear()
+            if len(self.filtered_distance) <= 0:
+                self.view.console_text_output.configure(state='normal')
+                self.view.console_text_output.insert('end','********* Value inserted is too small *********\n')
+                self.view.console_text_output.configure(state='disabled')
+            elif self.inputted_distance > sys.float_info.max:
+                self.view.console_text_output.configure(state='normal')
+                self.view.console_text_output.insert('end', '********* Range Filter exceeds system maximums *********\n')
+                self.view.console_text_output.configure(state='disabled')
+        except ValueError:
+            if not self.inputted_mass_string:
+                self.view.console_text_output.configure(state='normal')
+                self.view.console_text_output.insert('end','********* Range Filter Cannot be Null *********\n')
+                self.view.console_text_output.configure(state='disabled')
+            else:
+                self.view.console_text_output.configure(state='normal')
+                self.view.console_text_output.insert('end', '********* Please enter a number only *********\n')
+                self.view.console_text_output.configure(state='disabled')
+
+
+
+    def get_filtered_planet_mass(self):
+        self.inputted_mass = 0
+        self.filtered_mass = []
+        self.filtered_mass_planet=[]
+        # self.smallest_planet = min(self.model.planets, key=lambda p: p.mass)
+        # print(self.smallest_planet.mass)
+        # print(type(self.model.smallest_planet.mass))
+        # self.mass_min = self.model.smallest_planet.mass
+        try:
+            self.inputted_mass_string = self.view.mass_input.get()
+            self.inputted_mass = float(self.view.mass_input.get())
+            if 0 < self.inputted_mass:
+                self.view.console_text_output.configure(state='normal')
+                self.view.console_text_output.insert('end', '********* Mass filter applied *********\n')
+                self.tempPlanetsMass = [x for x in self.model.planets if float(x.mass) == float(self.inputted_mass)]
+
+                for planet in self.model.filteredPlanets:
+                    if float(planet.mass) < self.inputted_mass:
+                        self.filtered_mass.append([planet.name, planet.mass, planet.distance])
+                        self.filtered_mass_planet.append(planet.name)
+
+                    if (len(self.inputted_mass_string) == 0):
+                        self.view.console_text_output.configure(state='normal')
+                        self.view.console_text_output.insert('end',
+                                                             'Mass filter applied, no results containing \"' + self.inputted_mass_string + '\" found\n')
+                        self.view.console_text_output.configure(state='disabled')
+                        # Clear the input field
+                        self.view.name_input.delete(0, 'end')
+                        # Set the drop-down list to the filtered list
+                        self.view.selection_dropdown.configure(values=self.filtered_mass)
+                        self.view.planet_selection.set("No results found")
+                        return
+                    else:
+                        self.model.filteredPlanets = self.filtered_mass
+                        self.view.console_text_output.configure(state='normal')
+                        if (len(self.filtered_mass) == 1):
+                            self.view.console_text_output.insert('end',
+                                                                 'Mass filter applied, ' + str(
+                                                                     len(self.filtered_mass)) + ' result containing \"' + self.inputted_mass_string + '\" found\n')
+                            # If there is only one result, set the selected planet to that result
+                            self.view.planet_selection.set(self.filtered_mass[0])
+                        else:
+                            self.view.console_text_output.insert('end',
+                                                                 'Mass filter applied, ' + str(
+                                                                     len(self.filtered_mass)) + ' results containing \"' + self.inputted_mass_string + '\" found\n')
+                            self.view.planet_selection.set("Select a planet")
+                        self.view.console_text_output.configure(state='disabled')
+                        # Clear the input field
+                        self.view.name_input.delete(0, 'end')
+                        # Set the drop-down list to the filtered list
+                        self.view.selection_dropdown.configure(values=self.filtered_mass)
+                    # self.view.console_text_output.insert('end', ' ' + str(planet.name) + ' - ' + str(
+                    #     planet.mass) + ' - ' + str(planet.distance) + '\n')b
+            # self.model.filteredPlanets = self.filtered_mass_planet
+            # self.view.selection_dropdown.configure(values=self.tempPlanetsMass.name)
+            # self.model.filteredPlanets = self.filtered_mass
+            # self.view.mass_input.delete(0, END)
+            elif len(self.filtered_mass) == 0:
+                    self.view.console_text_output.configure(state='normal')
+                    self.view.console_text_output.insert('end', '********* Value inserted is too small *********\n')
+                    self.view.console_text_output.configure(state='disabled')
+            elif self.inputted_mass >= sys.float_info.max:
+                self.view.console_text_output.configure(state='normal')
+                self.view.console_text_output.insert('end', '********* Mass input exceeds system maximums *********\n')
+                self.view.console_text_output.configure(state='disabled')
+        except ValueError:
+            if not self.inputted_mass_string:
+                self.view.console_text_output.configure(state='normal')
+                self.view.console_text_output.insert('end','********* Mass Filter Cannot be Null *********\n')
+                self.view.console_text_output.configure(state='disabled')
+            else:
+                self.view.console_text_output.configure(state='normal')
+                self.view.console_text_output.insert('end', '********* Please enter a number only *********\n')
+                self.view.console_text_output.configure(state='disabled')
+                print("Input number only!!!!!!")
+
+    def filter_by_mass(self):
+        self.inputted_mass = 0
+        self.filtered_mass = []
+        self.filtered_mass_planet = []
+
+        try:
+            self.inputted_mass_string = self.view.mass_input.get()
+            self.inputted_mass = float(self.view.mass_input.get())
+
+            if self.inputted_mass <= 0:
+                self.view.console_text_output.configure(state='normal')
+                self.view.console_text_output.insert('end',
+                                                     '********* Mass value must be greater than zero *********\n')
+                self.view.console_text_output.configure(state='disabled')
+                return
+
+            self.view.console_text_output.configure(state='normal')
+            self.view.console_text_output.insert('end', '********* Mass filter applied *********\n')
+
+            for planet in self.model.filteredPlanets:
+                if float(planet.mass) < self.inputted_mass:
+                    self.filtered_mass.append(planet)
+                    self.filtered_mass_planet.append(planet.name)
+
+            if len(self.filtered_mass) == 0:
+                self.view.console_text_output.insert('end', 'No results found with mass less than ' + str(
+                    self.inputted_mass) + '\n')
+                self.view.console_text_output.configure(state='disabled')
+                self.view.name_input.delete(0, 'end')
+                self.view.selection_dropdown.configure(values=self.filtered_mass_planet)
+                self.view.planet_selection.set("No results found")
+                return
+
+            self.model.filteredPlanets = self.filtered_mass
+            self.view.console_text_output.insert('end', str(len(
+                self.filtered_mass)) + ' results found with mass less than ' + str(self.inputted_mass) + '\n')
+            self.view.console_text_output.configure(state='disabled')
+            self.view.name_input.delete(0, 'end')
+            self.view.selection_dropdown.configure(values=self.filtered_mass_planet)
+            self.view.planet_selection.set("Select a planet")
+
+        except ValueError:
+            if not self.inputted_mass_string:
+                self.view.console_text_output.configure(state='normal')
+                self.view.console_text_output.insert('end', '********* Mass filter value cannot be empty *********\n')
+                self.view.console_text_output.configure(state='disabled')
+            else:
+                self.view.console_text_output.configure(state='normal')
+                self.view.console_text_output.insert('end',
+                                                     '********* Please enter a valid number for the mass filter *********\n')
+                self.view.console_text_output.configure(state='disabled')
+
+    def get_filtered_distance2(self):
+        self.filtered_distance = []
+        self.filtered_distance_string = []
+
+        try:
+            self.inputted_distance_string = self.view.range_input.get()
+            self.inputted_distance = float(self.view.range_input.get())
+
+            if self.inputted_distance <= 0:
+                self.view.console_text_output.configure(state='normal')
+                self.view.console_text_output.insert('end',
+                                                     '********* Range value must be greater than zero *********\n')
+                self.view.console_text_output.configure(state='disabled')
+                return
+
+            self.view.console_text_output.configure(state='normal')
+            self.view.console_text_output.insert('end', '********* Range filter applied *********\n')
+
+            for planet in self.filtered_mass:  # Use the filtered_mass list instead of self.model.filteredPlanets
+                if hasattr(planet, 'distance') and float(planet.distance) < self.inputted_distance:
+                    self.filtered_distance_string.append([planet.name, planet.mass, planet.distance])
+                    self.filtered_distance.append(planet.name)
+
+            if len(self.filtered_distance_string) == 0:
+                self.view.console_text_output.insert('end', 'No results found with distance less than ' + str(
+                    self.inputted_distance) + '\n')
+                self.view.console_text_output.configure(state='disabled')
+                self.view.name_input.delete(0, 'end')
+                self.view.selection_dropdown.configure(values=self.filtered_distance)
+                self.view.planet_selection.set("No results found")
+                return
+
+            self.model.filteredPlanets = self.filtered_distance_string
+            self.view.console_text_output.insert('end', str(len(
+                self.filtered_distance_string)) + ' results found with distance less than ' + str(
+                self.inputted_distance) + '\n')
+            self.view.console_text_output.configure(state='disabled')
+            self.view.name_input.delete(0, 'end')
+            self.view.selection_dropdown.configure(values=self.filtered_distance)
+            self.view.planet_selection.set("Select a planet")
+
+        except ValueError:
+            if not self.inputted_distance_string:
+                self.view.console_text_output.configure(state='normal')
+                self.view.console_text_output.insert('end', '********* Range filter value cannot be empty *********\n')
+                self.view.console_text_output.configure(state='disabled')
+            else:
+                self.view.console_text_output.configure(state='normal')
+                self.view.console_text_output.insert('end',
+                                                     '********* Please enter a valid number for the range filter *********\n')
+                self.view.console_text_output.configure(state='disabled')
+
+    def filter_by_name2(self):
+            # Get the name that the user wants to search for
+            searchName = self.view.name_input.get().strip().lower()
+
+            # If the user submits without entering a name
+            if searchName == "":
+                self.view.console_text_output.configure(state='normal')
+                self.view.console_text_output.insert('end', 'Name filter submitted with no text entered\n')
+                self.view.console_text_output.configure(state='disabled')
+                # Clear the input field
+                self.view.name_input.delete(0, 'end')
+                return
+
+            # The longest name in the data is 29 characters (including spaces)
+            if len(searchName) > 29:
+                self.view.console_text_output.configure(state='normal')
+                self.view.console_text_output.insert('end', 'No results found\n')
+                self.view.console_text_output.configure(state='disabled')
+                # Clear the input field
+                self.view.name_input.delete(0, 'end')
+                # Set the drop-down list to empty
+                self.view.selection_dropdown.configure(values=[])
+                self.view.planet_selection.set("No results found")
+                return
+
+            # Check the dataset for the specified string
+            else:
+                tempPlanets = []
+
+                for planet in self.model.filteredPlanets:
+                    if hasattr(planet, 'name') and searchName in planet.name.lower():
+                        tempPlanets.append(planet)
+
+                if len(tempPlanets) == 0:
+                    self.view.console_text_output.configure(state='normal')
+                    self.view.console_text_output.insert('end',
+                                                         'Name filter applied, no results containing "' + searchName + '" found\n')
+                    self.view.console_text_output.configure(state='disabled')
+                    # Clear the input field
+                    self.view.name_input.delete(0, 'end')
+                    # Set the drop-down list to the filtered list
+                    self.view.selection_dropdown.configure(values=tempPlanets)
+                    self.view.planet_selection.set("No results found")
+                    return
+                else:
+                    self.model.filteredPlanets = tempPlanets
+                    self.view.console_text_output.configure(state='normal')
+                    if len(tempPlanets) == 1:
+                        self.view.console_text_output.insert('end', 'Name filter applied, ' + str(
+                            len(tempPlanets)) + ' result containing "' + searchName + '" found\n')
+                        # If there is only one result, set the selected planet to that result
+                        self.view.planet_selection.set(tempPlanets[0])
+                    else:
+                        self.view.console_text_output.insert('end', 'Name filter applied, ' + str(
+                            len(tempPlanets)) + ' results containing "' + searchName + '" found\n')
+                        self.view.planet_selection.set("Select a planet")
+                    self.view.console_text_output.configure(state='disabled')
+                    # Clear the input field
+                    self.view.name_input.delete(0, 'end')
+                    # Set the drop-down list to the filtered list
+                    self.view.selection_dropdown.configure(values=tempPlanets)
+

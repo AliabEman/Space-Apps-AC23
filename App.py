@@ -41,7 +41,6 @@ class Splash(tk.Toplevel):
         self.my_progress = ttk.Progressbar(self, orient="horizontal", length=splash_width / 2,
                                            mode="determinate")
         self.my_progress.pack(pady=10)
-
         # Add the progress label to the splash screen
         self.progress_label = ttk.Label(self, text="0%")
         self.progress_label.pack()
@@ -94,7 +93,6 @@ class App(tk.Tk):
 
     @staticmethod
     def startup_process(self):
-
         # Function called if the CSV requires reformatting
         def cleanup_csv(nasa_data_frame):
             nasa_data_frame = pandas.read_csv(csvName)
