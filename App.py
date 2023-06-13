@@ -66,7 +66,7 @@ class App(tk.Tk):
         self.splash = None
         self.start_up_app()
 
-        self.title("MVC_CSV_GUI DEMO")
+        self.title("SandGlass application")
         # currently locking the parent window since the layout does not properly resize with window
         self.resizable(False, False)
 
