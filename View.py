@@ -245,18 +245,18 @@ class View(ttk.Frame):
         self.name_submit_button = tkinter.Button(self.filter_frame, text="Submit", background="green", relief="raised",
                                                  borderwidth=5, highlightthickness=0, highlightbackground="blue",
                                                  font=submit_font, justify="center",
-                                                 command=self.controller.filter_by_name)
+                                                 command=self.controller.filter_by_name2)
         self.name_submit_button.place(relx=0.725, rely=0.29, relwidth=0.2, relheight=0.05)
 
         self.range_submit_button = tkinter.Button(self.filter_frame, text="Submit", background="green", relief="raised",
                                                   borderwidth=5, highlightthickness=0, highlightbackground="blue",
                                                   font=submit_font, justify="center",
-                                                  command=self.controller.filter_by_range)
+                                                  command=self.controller.get_filtered_distance2)
         self.range_submit_button.place(relx=0.725, rely=0.48, relwidth=0.2, relheight=0.05)
 
         self.mass_submit_button = tkinter.Button(self.filter_frame, text="Submit", background="green", relief="raised",
                                                  borderwidth=5, highlightthickness=0, highlightbackground="blue",
-                                                 font=submit_font, justify="center")
+                                                 font=submit_font, justify="center", command=self.controller.filter_by_mass)
         self.mass_submit_button.place(relx=0.725, rely=0.67, relwidth=0.2, relheight=0.05)
 
         self.slider_submit_button = tkinter.Button(self.filter_frame, text="Submit", background="green",

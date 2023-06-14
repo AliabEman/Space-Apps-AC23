@@ -3,7 +3,6 @@ from tkinter import ttk
 from PIL import Image, ImageTk
 import pandas
 import multiprocessing
-
 from Controller import Controller
 from Model import Model
 from View import View
