@@ -286,13 +286,14 @@ class View(ttk.Frame):
         #  show what is available for visualizing here in the view
         #print(algorithm_results)
 
-        # ensure planet was passed, if object does not exist stop function and do not instantiate pygame
+        # ensure planet was passed, if object does not exist stop function and do not instantiate pygame        time_in_billions_of_years:.2f
         if selected_planet is None:
             return
         else:
 
+           
             # define some test data to display
-            text = "Selected Planet values:\n Name={}, Range={},mass={} Efficiency: {}\n\nAlgorithm Results\n\nExpansion Time: {}\nCalculation Time: {} Seconds\nStarting Velocity: {} km/s".format(
+            text = "Selected Planet values:\n Name={}, Range={},mass={} Efficiency: {}\n\nAlgorithm Results\n\nExpansion Time: {}\nCalculation Time: {:0.2f} Seconds\nStarting Velocity: {:0.2f} km/s".format(
                 selected_planet.name,
                 selected_planet.distance,
                 selected_planet.mass,

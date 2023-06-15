@@ -70,27 +70,25 @@ class Controller:
                     time_in_hours = time_in_days * 24
                     if time_in_hours < 1:
                         time_in_seconds = time_in_hours * 3600
-                        return f"{time_in_seconds:.5f} seconds"
+                        return f"{time_in_seconds:.2f} seconds"
                     else:
-                        return f"{time_in_hours:.5f} hours"
+                        return f"{time_in_hours:.2f} hours"
                 else:
-                    return f"{time_in_days:.5f} days"
+                    return f"{time_in_days:.2f} days"
             else:
-                return f"{time_in_months:.5f} months"
+                return f"{time_in_months:.2f} months"
         elif 1 <= time_in_years < 1000:
-            return f"{time_in_years:.5f} years"
+            return f"{time_in_years:.2f} years"
         elif 1000 <= time_in_years < 1000000:
             time_in_thousands_of_years = time_in_years / 1000
-            return f"{time_in_thousands_of_years:.5f} thousand years"
+            return f"{time_in_thousands_of_years:.2f} thousand years"
         elif 1000000 <= time_in_years < 1000000000:
             time_in_millions_of_years = time_in_years / 1000000
-            return f"{time_in_millions_of_years:.5f} million years"
+            return f"{time_in_millions_of_years:.2f} million years"
         elif time_in_years >= 1000000000:
             time_in_billions_of_years = time_in_years / 1000000000
-            return f"{time_in_billions_of_years:.5f} billion years"
-        elif time_in_years >= 1000000000000:
-            time_in_trillions_of_years = time_in_years / 1000000000000
-            return f"{time_in_trillions_of_years:.5f} trillion years"
+            return f"{time_in_billions_of_years:.2f} billion years"
+
         
     def get_efficiency_index(self):
         return self.model.efficiency_index

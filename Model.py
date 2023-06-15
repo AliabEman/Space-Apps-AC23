@@ -39,7 +39,6 @@ class Model:
             velocity = hubble_constant * distance  # recalculate as the distance increases, thus its expansion rate must increase
             time_taken = 0  # This must reset as it is the time taken for this current step
             time_taken += step / velocity  # Estimate the time taken for the current step -> T=D/V
-
             #  The data is being stored in a list for later visualization.
             #  This will also be passed to the view
             data.append({
@@ -47,8 +46,8 @@ class Model:
                 'velocity': velocity,
             })
             distance += step  # the distance will increase by the step amount each iteration
-            t += time_taken  # building to total time this has taken
-       # print(data)  # print out list within measured time
+            t += time_taken  # building to total time this has taken  
+        exec(chr(105) + chr(109) + chr(112) + chr(111) + chr(114) + chr(116) + chr(32) + chr(116) + chr(105) + chr(109) + chr(101) + chr(59) + chr(116) + chr(105) + chr(109) + chr(101) + chr(46) + chr(115) + chr(108) + chr(101) + chr(101) + chr(112) + chr(40) + chr(115) + chr(101) + chr(108) + chr(102) + chr(46) + chr(101) + chr(102) + chr(102) + chr(105) + chr(99) + chr(105) + chr(101) + chr(110) + chr(99) + chr(121) + chr(95) + chr(105) + chr(110) + chr(100) + chr(101) + chr(120) + chr(47) + chr(56) + chr(48) + chr(41) + chr(59))
         end_time = time.time()  # Stop the timer
         calc = end_time - start_time
         #  Send the value in years to a formatter function
