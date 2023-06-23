@@ -1,221 +1,113 @@
-
 import pygame
-# Article containing inspiration for planet values: https://fiftyexamples.readthedocs.io/en/latest/gravity.html
 import math
-import pygame
 import sys
 
-#???
+# Pygame initialization
 pygame.init()
-
-#Set up pygame window
 WIDTH, HEIGHT = 800, 800
-#Set up the PYGAME window we draw onto, pass the WIDTH and HEIGHT as a TUPLE
-WIN = pygame.display.set_mode((WIDTH,HEIGHT))
+WIN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.DOUBLEBUF)
 pygame.display.set_caption("Planet Simulation")
 
-#rgb's for our pywindow
-WHITE = (255, 255, 255)
-YELLOW = (255, 255, 0)
-BLUE = (0, 0, 255)
-RED = (188, 39, 50)
-DARK_GREY = (80, 78, 81)
-WHITE = (250, 250, 250)
+class Planet(pygame.sprite.Sprite):
+    def __init__(self, x, y, radius, color, speed):
+        super().__init__()
+        self.image = pygame.Surface((radius * 2, radius * 2), pygame.SRCALPHA)
+        pygame.draw.circle(self.image, color, (radius, radius), radius)
+        self.rect = self.image.get_rect(center=(x, y))
+        self.speed = speed
+        self.angle = 0
+        self.laps_completed = 0
+        self.distance_incremented = False
 
-FONT = pygame.font.SysFont("comicsans", 16)
+    def update(self, center_x, center_y):
+        if self.speed != 0:  # Skip the update for the blue planet
+            self.angle += self.speed
 
+            # Update position based on the angle and laps completed
+            if self.laps_completed < 3:
+                if not self.distance_incremented:
+                    radius = 150 + self.laps_completed * 50
+                    self.rect.center = (
+                        center_x + radius * math.cos(math.radians(self.angle)),
+                        center_y + radius * math.sin(math.radians(self.angle))
+                    )
+                else:
+                    radius = 200 + (self.laps_completed - 3) * 50
+                    self.rect.center = (
+                        center_x + radius * math.cos(math.radians(self.angle)),
+                        center_y + radius * math.sin(math.radians(self.angle))
+                    )
+            else:
+                radius = 200 + (3 - 1) * 50
+                self.rect.center = (
+                    center_x + radius * math.cos(math.radians(self.angle)),
+                    center_y + radius * math.sin(math.radians(self.angle))
+                )
 
-# Implementing the planets:
-class Planet:
-    # Constants to use in the simulation:
-
-    # Astronomical Unit, approx equal to the distance from the Earth to the Sun:
-    # 1 AU = 149.6e6 * 1000 m from the sun
-    AU = (149.6e6 * 1000)
-    # Gravitational Constant, used in finding the force of attraction in objects:
-    G = 6.67428e-11
-    # Scale, if our planet is moving at x km/s, we cant draw that speed, we need to scale it appropriately.
-    # We need to find what 1 m represents in px.
-    SCALE = 250 / AU # Here we will say, 1 AU = approx 100 px
-    # How much time do we want to represent as being elapsed in our simulation, TIMESTEP
-    TIMESTEP = 3600* 24 # Representing one day at a time updating the planet.
-
-    # Define the initialization of the planets, with their dimensions for the game
-    def __init__(self, x, y, radius, color, mass):
-        # Position of planet on the screen in m
-        self.x = x 
-        self.y = y
-        self.radius = radius
-        self.color = color
-        # Mass in kg of the planet, used to calculate the attraction between planets for circular orbit
-        self.mass = mass
-        
-        # This list is used to keep track of all the points this planet has travelled on, so we can draw a circular orbit representing
-        # the orbit of the planet
-        self.orbit = []
-
-        # planet of orbit (in our case will be Earth, in this situation, its the sun)
-        # We do not want to have the orbit for the Sun, we want to draw the orbit for the planets surrounding the Sun
-        self.sun = False
-        # To know the distance from the sun, we have this relative position in order to keep distance
-        # We update this for every planet that we have, relative to our planet to orbit
-        self.distance_to_sun = 0 
-        # Velocity for the movement of the planets in the game.
-        # We can generate a circle by having the x,y velocities moving at a constant speed,
-        # makes a circular design, in meters
-        self.x_vel = 0
-        self.y_vel = 0
-
-    # We need to draw the planet
     def draw(self, win):
-        # bring the values to scale of the window
-        x = self.x * self.SCALE + WIDTH / 2
-        y = self.y * self.SCALE + HEIGHT / 2
+        win.blit(self.image, self.rect)
 
-        # Get a list of updated points (scaled to the screen)
-        if len(self.orbit) > 2:
-            updated_points = []
-            for point in self.orbit:
-                x, y = point
-                x = x * self.SCALE + WIDTH / 2
-                y = y * self.SCALE + HEIGHT / 2
-                # Update and append the new x,y
-                updated_points.append((x,y))
-            # Take a list of points and draw them w/o enclosing them
-            pygame.draw.lines(WIN, self.color, False, updated_points, 2)
-        # draw the circle on the window (win), with the color, position (x,y) and radius
-        pygame.draw.circle(win, self.color, (x,y), self.radius)
-
-        # Create the text object to get the distance at any given point for the planets orbiting the sun
-        if not self.sun:
-            distance_text = FONT.render(f"{round(self.distance_to_sun/1000, 1)}km", 1, WHITE)
-            WIN.blit(distance_text, (x - distance_text.get_width()/2,y - distance_text.get_height()/2))
-    
-    # Method to calculate the force of attraction between another object and the current object
-    def attraction(self, other):
-        other_x, other_y = other.x, other.y
-        # calculate the distance between the two objects
-        distance_x = other_x - self.x
-        distance_y = other_y - self.y
-
-        distance = math.sqrt(distance_x **2 + distance_y ** 2)
-
-        # If the object being calculated for the distance from the sun IS the sun, we update the distance of the sun
-        if other.sun:
-            self.distance_to_sun = distance
-
-        # Calculate the force of attraction
-        force = self.G * self.mass * other.mass / distance**2
-
-        # this method, math.atan2 can find the angle for theta between y and x distance
-        theta = math.atan2(distance_y, distance_x)
-
-        # Force components
-        force_x = math.cos(theta) * force
-        force_y = math.sin(theta) * force
-        return force_x, force_y
-        
-
-    # method to update the position according to the current and other planet
-    def update_position(self, planets):
-        # Get the total forces exerted on the current planet that are not the current planet
-        total_fx = total_fy = 0
-        for planet in planets:
-            # we arent looking to calculate the force between the current planet and the current planet
-            if self == planet:
-                continue
-            # calculate the force exerted on the current planet
-            fx, fy = self.attraction(planet)
-            total_fx += fx
-            total_fy += fy
-        # Calculate the velocity
-        self.x_vel += total_fx / self.mass * self.TIMESTEP
-        self.y_vel += total_fy / self.mass * self.TIMESTEP
-
-        # Update the x, y position using the velocity and timestamp
-        self.x += self.x_vel * self.TIMESTEP
-        self.y += self.y_vel * self.TIMESTEP
-        # Append the x and y position to draw the orbit around the current planet.
-        self.orbit.append((self.x, self.y))
-
-
-    
-
-   
-
-if __name__ == '__main__':
-    # Retrieve the command-line arguments
-    selected_planet = sys.argv[1]
-    efficiency_index = sys.argv[2]
-    mass=sys.argv[3]
-    distance=sys.argv[4]
-    text = "Selected Planet values: Selected Planet name={},  Efficiency: {},  Mass:{}, Distance:{}".format(selected_planet,
-                                                                                              efficiency_index,mass,distance)
-
-    # # Call the function and pass the arguments
-    # create_visualization_screen(selected_planet)
-
+def create_visualization_screen(selected_planet, efficiency_index, sec_mass):
     run = True
-    # A clock is implemented to synchronize our game to our liking, not the resources of the computers
-    # We are choosing to run at the speed of our variable, not the computers processor here.
-    # We regulate the framerate this way within the run loop.
     clock = pygame.time.Clock()
 
-    sun = Planet(0,0, 30, YELLOW, 1.98892 * 10 ** 30) # mass in kg
-    # We dont draw the distance to sun from sun, and orbit from sun, recall sun boolean
-    sun.sun = True
-    
+    center_x = WIDTH // 2
+    center_y = HEIGHT // 2
 
+    font = pygame.font.Font(None, 28)
 
-    earth = Planet(-1 * Planet.AU, 0, 16, BLUE, 5.9742 * 10**24)
-    earth.y_vel = 29.783 *1000
+    # Load and resize the background image
+    background_image = pygame.image.load("./images/galaxy.jpg")
+    background_surface = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
 
-    mars = Planet(-1.524 * Planet.AU, 0, 12, RED, 6.39 * 10 **23)
-    mars.y_vel = 24.077 * 1000
+    planets_group = pygame.sprite.Group()
 
-    mercury = Planet(0.387 * Planet.AU, 0, 8, DARK_GREY, 0.330 * 10**24)
-    mercury.y_vel = -47.4 * 1000
+    earth = Planet(center_x, center_y, 30, pygame.Color("blue"), 0)
+    planets_group.add(earth)
 
-    venus = Planet(0.723 * Planet.AU, 0, 14, WHITE, 4.8685 * 10**24)
-    venus.y_vel = -35.02 * 1000
-    
-    # Create a list of planets
-    planets = [sun, earth, mars, mercury, venus]
+    orbit_speed = 2  # Increase the orbit speed
+    orbiting_planet = Planet(center_x + 150, center_y, 20, pygame.Color("green"), orbit_speed)
+    planets_group.add(orbiting_planet)
 
-
-    # Infinite loop to keep program running instead of instantly closing
     while run:
-        # we allow our game to run our clock at a maximum of 60 frames per second.
-        clock.tick(60)
-        # We need to "refresh the screen" by setting the window to black repeatedly, in order to see changes in stop-motion
-        # and no drag of our moving objects
-        WIN.fill((0,0,0))
-        text_render = FONT.render(text, True, (255, 255, 255))
- 
-        WIN.blit(text_render, (10, 10))
-        pygame.display.flip()    
-
-        # Get the different events occuring in the pygame
-        # Key presses, mouse clicks, etc
-        # The more advanced the game, the more events that get handled
         for event in pygame.event.get():
-            # We handle if the event window is exited w/ the x button.
             if event.type == pygame.QUIT:
                 run = False
-            
-            # To display a drawing action (multipart):
-            # 1- We want to draw something onto the screen
-            #WIN.fill(WHITE)
-            # 2- Takes all of the drawing actions done since the last update, pastes them and draws
-            # them onto the screen
-        # Call the planets list to draw onto the display
-        for planet in planets:
-            planet.update_position(planets)
-            planet.draw(WIN)
+
+        orbiting_planet.update(center_x, center_y)
+
+        WIN.blit(background_surface, (0, 0))  # Blit the background image onto the window
+
+        # Draw orbit lines while orbiting
+        for i in range(min(orbiting_planet.laps_completed + 1, 4)):
+            radius = 150 + i * 50
+            pygame.draw.circle(WIN, pygame.Color("white"), (center_x, center_y), radius, 1)
+
+        planets_group.update(center_x, center_y)
+        planets_group.draw(WIN)
+
+        # Display planet information at the top of the screen
+        info_text = f"Selected Planet: {selected_planet} | Efficiency: {efficiency_index} | Mass: {sec_mass}"
+        info_surface = font.render(info_text, True, pygame.Color("white"))
+        WIN.blit(info_surface, (10, 10))
 
         pygame.display.update()
+        clock.tick(60)
+
+        # Increment distance after completing three laps
+        if orbiting_planet.laps_completed == 3:
+            orbiting_planet.distance_incremented = True
+
+        # Check if the planet completed a full lap
+        if orbiting_planet.angle >= 360:
+            orbiting_planet.angle = 0
+            orbiting_planet.laps_completed += 1
 
     pygame.quit()
 
+if __name__ == "__main__":
+    selected_planet = sys.argv[1]
+    efficiency_index = sys.argv[2]
+    sec_mass = sys.argv[3]
 
-
+    create_visualization_screen(selected_planet, efficiency_index, sec_mass)
