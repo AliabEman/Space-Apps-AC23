@@ -14,7 +14,7 @@ class View(ttk.Frame):
         # parent is the TK() root window of the app
         self.parent = parent
 
-        # can declare references to widgets that will need controller and model functionality
+        # declare references to widgets that will need controller and model functionality
         # then build the widget on reference in the Build GUI method
         self.console_text_output = None
         self.selection_dropdown = None
@@ -245,13 +245,13 @@ class View(ttk.Frame):
         self.name_submit_button = tkinter.Button(self.filter_frame, text="Submit", background="green", relief="raised",
                                                  borderwidth=5, highlightthickness=0, highlightbackground="blue",
                                                  font=submit_font, justify="center",
-                                                 command=self.controller.filter_by_name2)
+                                                 command=self.controller.filter_by_name)
         self.name_submit_button.place(relx=0.725, rely=0.29, relwidth=0.2, relheight=0.05)
 
         self.range_submit_button = tkinter.Button(self.filter_frame, text="Submit", background="green", relief="raised",
                                                   borderwidth=5, highlightthickness=0, highlightbackground="blue",
                                                   font=submit_font, justify="center",
-                                                  command=self.controller.get_filtered_distance2)
+                                                  command=self.controller.get_filtered_distance)
         self.range_submit_button.place(relx=0.725, rely=0.48, relwidth=0.2, relheight=0.05)
 
         self.mass_submit_button = tkinter.Button(self.filter_frame, text="Submit", background="green", relief="raised",

@@ -1,6 +1,7 @@
 import re
 import pygame as pygame
 
+
 class Controller:
     def __init__(self, model, view):
         self.model = model
@@ -10,16 +11,16 @@ class Controller:
         return self.model.filteredPlanets
 
     def start_algorithm(self):
-            print("validate button modification")
-            selected_planet = self.get_selected_planet()
-            self.model.run_algorithm(self, selected_planet)
-            
-    def clear_filters(self):
+        selected_planet = self.get_selected_planet()
+        self.model.run_algorithm(self, selected_planet)
 
-        # test = ["test1", "test2", "test3"]
+    # function to restore the planet selection list to the original DataSet included at initialization.
+    def clear_filters(self):
 
         # reset the filter planet list to the original state
         self.model.filteredPlanets = self.model.planets
+        # reset the efficiency index of the application
+        self.model.efficiency_index = 1
 
         # reset the output window text, include welcome message and filter message
         self.view.console_text_output.configure(state='normal')
@@ -28,28 +29,34 @@ class Controller:
         self.view.console_text_output.insert('end', 'All filters have been removed, Original planet list restored\n')
         self.view.console_text_output.configure(state='disabled')
 
-        # self.view.selection_dropdown['values'] = test
         # set the option values of the dropdown list
         self.view.selection_dropdown['values'] = self.model.filteredPlanets
 
         self.view.planet_selection.set("Select a planet")
 
+    # function to parse out the planet names from dataset to be used in selection menu on interface
     def get_planets_names(self):
         selection_dropdown_planet_names = []
         for planet in self.model.filteredPlanets:
             name = planet.name
             selection_dropdown_planet_names.append(name)
 
-    # function to be replaced by calculation and visualization, For now it just retrieves the selected planet from the
-    # list and passes some information to the Pygame window for testing purposes.
+    # function to validate planet selection drop down and pass a valid planet selection to the algorithmic module
     def get_selected_planet(self):
 
         # grab string value from selection drop down menu
         selected_planet = self.view.selection_dropdown.get()
 
-        if selected_planet == "Select a planet" or selected_planet == "No results found":
+        if selected_planet == "Select a planet":
             self.view.console_text_output.configure(state='normal')
             self.view.console_text_output.insert('end', 'Invalid selection, please choose planet from drop down!\n')
+            self.view.console_text_output.configure(state='disabled')
+            return
+
+        elif selected_planet == "No results found":
+            self.view.console_text_output.configure(state='normal')
+            self.view.console_text_output.insert('end', 'No planets are available in the current list, '
+                                                        'please clear filters and start again\n')
             self.view.console_text_output.configure(state='disabled')
             return
 
@@ -58,6 +65,7 @@ class Controller:
                 if planet.name == selected_planet:
                     selected_planet = planet
                     return selected_planet
+
     #  function to take in a value in years, and convert it in a way appropriate to display
     #  returns string holding time with appropriate units
     @staticmethod
@@ -89,7 +97,6 @@ class Controller:
             time_in_billions_of_years = time_in_years / 1000000000
             return f"{time_in_billions_of_years:.2f} billion years"
 
-        
     def get_efficiency_index(self):
         return self.model.efficiency_index
 
@@ -102,7 +109,8 @@ class Controller:
         # reset the output window text, include welcome message and filter message
         self.view.console_text_output.configure(state='normal')
         self.view.console_text_output.insert('end',
-                                             'Efficiency index of calculation set to ' + str(efficiency_value) + '\n')
+                                             'Efficiency index of calculation set to %' + str(efficiency_value) +
+                                             'factor of calculation increments\n')
         self.view.console_text_output.configure(state='disabled')
 
     def filter_by_mass(self):
@@ -126,7 +134,7 @@ class Controller:
             self.view.mass_input.delete(0, 'end')
 
             for planet in self.model.filteredPlanets:
-             if hasattr(planet,'mass') and float(planet.mass) < self.inputted_mass:
+                if hasattr(planet, 'mass') and float(planet.mass) < self.inputted_mass:
                     self.filtered_mass.append(planet)
                     self.filtered_mass_planet.append(planet.name)
 
@@ -158,7 +166,7 @@ class Controller:
                                                      '********* Please enter a valid number for the mass filter *********\n')
                 self.view.console_text_output.configure(state='disabled')
 
-    def get_filtered_distance2(self):
+    def get_filtered_distance(self):
         self.filtered_distance = []
         self.filtered_distance_string = []
 
@@ -211,68 +219,67 @@ class Controller:
                                                      '********* Please enter a valid number for the range filter *********\n')
                 self.view.console_text_output.configure(state='disabled')
 
-    def filter_by_name2(self):
-            # Get the name that the user wants to search for
-            searchName = self.view.name_input.get().strip().lower()
+    def filter_by_name(self):
+        # Get the name that the user wants to search for
+        searchName = self.view.name_input.get().strip().lower()
 
-            # If the user submits without entering a name
-            if searchName == "":
+        # If the user submits without entering a name
+        if searchName == "":
+            self.view.console_text_output.configure(state='normal')
+            self.view.console_text_output.insert('end', '********* Name filter value cannot be empty *********\n')
+            self.view.console_text_output.configure(state='disabled')
+            # Clear the input field
+            self.view.name_input.delete(0, 'end')
+            return
+
+        # The longest name in the data is 29 characters (including spaces)
+        if len(searchName) > 29:
+            self.view.console_text_output.configure(state='normal')
+            self.view.console_text_output.insert('end', '********* No results found *********\n')
+            self.view.console_text_output.configure(state='disabled')
+            # Clear the input field
+            self.view.name_input.delete(0, 'end')
+            # Set the drop-down list to empty
+            self.view.selection_dropdown.configure(values=[])
+            self.view.planet_selection.set("********* No results found *********")
+            return
+
+        # Check the dataset for the specified string
+        else:
+            tempPlanets = []
+
+            for planet in self.model.filteredPlanets:
+                if hasattr(planet, 'name') and searchName in planet.name.lower():
+                    tempPlanets.append(planet)
+
+            if len(tempPlanets) == 0:
                 self.view.console_text_output.configure(state='normal')
-                self.view.console_text_output.insert('end', 'Name filter submitted with no text entered\n')
+                self.view.console_text_output.insert('end',
+                                                     '********* Name filter applied *********\n no results containing "' + searchName + '" found\n')
                 self.view.console_text_output.configure(state='disabled')
                 # Clear the input field
                 self.view.name_input.delete(0, 'end')
+                # Set the drop-down list to the filtered list
+                self.view.selection_dropdown.configure(values=tempPlanets)
+                self.view.planet_selection.set("No results found")
                 return
-
-            # The longest name in the data is 29 characters (including spaces)
-            if len(searchName) > 29:
-                self.view.console_text_output.configure(state='normal')
-                self.view.console_text_output.insert('end', '********* No results found *********\n')
-                self.view.console_text_output.configure(state='disabled')
-                # Clear the input field
-                self.view.name_input.delete(0, 'end')
-                # Set the drop-down list to empty
-                self.view.selection_dropdown.configure(values=[])
-                self.view.planet_selection.set("********* No results found *********")
-                return
-
-            # Check the dataset for the specified string
             else:
-                tempPlanets = []
-
-                for planet in self.model.filteredPlanets:
-                    if hasattr(planet, 'name') and searchName in planet.name.lower():
-                        tempPlanets.append(planet)
-
-                if len(tempPlanets) == 0:
-                    self.view.console_text_output.configure(state='normal')
-                    self.view.console_text_output.insert('end',
-                                                         '********* Name filter applied *********\n no results containing "' + searchName + '" found\n')
-                    self.view.console_text_output.configure(state='disabled')
-                    # Clear the input field
-                    self.view.name_input.delete(0, 'end')
-                    # Set the drop-down list to the filtered list
-                    self.view.selection_dropdown.configure(values=tempPlanets)
-                    self.view.planet_selection.set("No results found")
-                    return
+                self.model.filteredPlanets = tempPlanets
+                self.view.console_text_output.configure(state='normal')
+                if len(tempPlanets) == 1:
+                    self.view.console_text_output.insert('end', '********* Name filter applied *********\n ' + str(
+                        len(tempPlanets)) + ' result containing "' + searchName + '" found\n')
+                    # If there is only one result, set the selected planet to that result
+                    self.view.planet_selection.set(tempPlanets[0])
                 else:
-                    self.model.filteredPlanets = tempPlanets
-                    self.view.console_text_output.configure(state='normal')
-                    if len(tempPlanets) == 1:
-                        self.view.console_text_output.insert('end', '********* Name filter applied *********\n ' + str(
-                            len(tempPlanets)) + ' result containing "' + searchName + '" found\n')
-                        # If there is only one result, set the selected planet to that result
-                        self.view.planet_selection.set(tempPlanets[0])
-                    else:
-                        self.view.console_text_output.insert('end', '********* Name filter applied *********\n ' + str(
-                            len(tempPlanets)) + ' results containing "' + searchName + '" found\n')
-                        self.view.planet_selection.set("Select a planet")
-                    self.view.console_text_output.configure(state='disabled')
-                    # Clear the input field
-                    self.view.name_input.delete(0, 'end')
-                    # Set the drop-down list to the filtered list
-                    self.view.selection_dropdown.configure(values=tempPlanets)
-
+                    self.view.console_text_output.insert('end', '********* Name filter applied *********\n ' + str(
+                        len(tempPlanets)) + ' results containing "' + searchName + '" found\n')
+                    self.view.planet_selection.set("Select a planet")
+                self.view.console_text_output.configure(state='disabled')
+                # Clear the input field
+                self.view.name_input.delete(0, 'end')
+                # Set the drop-down list to the filtered list
+                self.view.selection_dropdown.configure(values=tempPlanets)
 
     # Function that creates a window with the "about" information of the application
     def about_app(self):
@@ -280,25 +287,31 @@ class Controller:
         pygame.init()
         screen = pygame.display.set_mode((800, 500))
         pygame.display.set_caption("About the Application")
-        
+
         # Function that will send text to the next line when it finds a \n (since pygame can't process them)
         def process_newlines(text_to_split):
             # Create a list where every element is a line of text up to a newline character. Deletes the newline character
             split_text = text_to_split.split('\n')
-            
+
             # Create a list of surfaces, where each surface in the list is one line of text
             surfaces = []
             for sentence in split_text:
                 new_surface = font.render(sentence, True, (255, 255, 255))
                 surfaces.append(new_surface)
             return surfaces
-        
+
         # Define the text to display
         font = pygame.font.SysFont("Arial", 20)
-        text = "Authors:\nAlexander Lapierre\nAliab Eman\nDylan Carroll\nGreg Rowat\nJay Patel\nSavas Erturk\n\n"
-        text += "This app has been created for the NASA SpaceApps Competition!"
-        text += "\n\nDev note: More text will be added here to define the algorithm"
-        
+        text = "SandGlass has been created for the NASA SpaceApps 2023 Competition!"
+        text += "\n\nSandGlass is an interactive application for interfacing with the NASA Exoplanet archives database in\n" \
+                "order to determine the point when an individual planet will leave the currently viewable universe\n" \
+                "SandGlass allows the user to filter and select from all known Exoplanets classified by NASA based on the\n" \
+                "planets title, current distance from earth in parsecs (pc), and planetary mass in relation to Earth.\n" \
+                "Using the current Hubble constant and the maximum distance viewable by the hubble telescope Sandglass\n" \
+                "is able to determine how many years it will take for a planet to reach the edge of the viewable universe\n" \
+                "based on universal expansion theory."
+        text += "\n\nAuthors:\nAlexander Lapierre\nAliab Eman\nDylan Carroll\nGreg Rowat\nJay Patel\nSavas Erturk\n\n"
+
         # Create an array that will store the lines that fit into the window
         formatted_text = process_newlines(text)
 
@@ -313,7 +326,7 @@ class Controller:
             # Print each surface in the list
             for surface in formatted_text:
                 screen.blit(surface, (10, yPosition))
-                yPosition += 20 # Increment the y position for blit so each surface prints on a new line
+                yPosition += 20  # Increment the y position for blit so each surface prints on a new line
             pygame.display.flip()
 
         pygame.quit()

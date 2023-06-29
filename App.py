@@ -16,7 +16,7 @@ class Splash(tk.Toplevel):
         # Hide the title bar for the splash window
         self.overrideredirect(True)
 
-        # Define the splash screen frame size
+        # Define the splash screen frame size dynamically based on system specs
         screen_width = self.winfo_screenwidth()
         splash_width = screen_width - 100
         screen_height = self.winfo_screenheight()
@@ -26,10 +26,7 @@ class Splash(tk.Toplevel):
         self.geometry(f"{splash_width}x{splash_height}+{splash_xposition}+{splash_yposition}")
         self.progress = 0
 
-        # # Add the image to the splash screen
-        # self.splash_label = Label(self.splash_root)
-
-        # Set the image for the splash screen
+        # Set the background image for the splash screen
         self.splash_image = Image.open("images/Splash Screen.jpg")
         self.resized = self.splash_image.resize((splash_width - 100, splash_height - 100))
         self.splash_photo = ImageTk.PhotoImage(self.resized)
@@ -46,7 +43,6 @@ class Splash(tk.Toplevel):
         self.progress_label.pack()
 
     # Define the function to update the progress bar
-    # Needs editing to look dynamic as splash screen is "loading the App"
     def update_progress(self):
         if self.progress <= 101:
             self.my_progress["value"] = self.progress
@@ -66,7 +62,7 @@ class App(tk.Tk):
         self.start_up_app()
 
         self.title("SandGlass application")
-        # currently locking the parent window since the layout does not properly resize with window
+        # locking the parent window since the layout does not properly resize with window
         self.resizable(False, False)
 
         self.mainloop()
@@ -91,6 +87,7 @@ class App(tk.Tk):
         self.withdraw()
         self.splash = Splash(self)
 
+    # function to initialize application on its own thread to prevent application data corruption
     @staticmethod
     def startup_process(self):
 
@@ -152,7 +149,7 @@ class App(tk.Tk):
 
         controller = Controller(model, view)
 
-        # assign controller to the view ( Not the best practice but it works for now )
+        # assign controller to the view
         view.set_controller(controller)
 
         # draw the GUI on top of the layout, Must come after the controller in oder to assign values to widgets from

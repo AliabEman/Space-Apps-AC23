@@ -1,6 +1,7 @@
 from Planet import Planet
 import time
 
+
 class Model:
 
     def __init__(self, planet_data):
@@ -16,9 +17,8 @@ class Model:
         self.filteredPlanets = []
         self.filteredPlanets = self.planets
 
-        # will probably need some fields to save model data in order to pass it to the algorithm?
         self.selected_planet = None
-        self.efficiency_index = 1  # TODO have this reflect the actual selected slider value
+        self.efficiency_index = 1
 
     # function that takes in the selected planet
     # calls convert_time_unit in controller to clean up algorithm results
@@ -29,7 +29,8 @@ class Model:
         distance = selected_planet.distance  # pull selected planets distance
         t = 0  # this is to count years for the final result
         starting_velocity = hubble_constant * distance  # For informational purposes in the view, get the starting velocity
-        step = 9999999 - (self.efficiency_index*9999)  # Cause more calculations if higher efficient index is selected. This must be a large value. Be careful changing
+        step = 9999999 - (
+                    self.efficiency_index * 9999)  # Cause more calculations if higher efficient index is selected. This must be a large value. Be careful changing
         start_time = time.time()  # Start the timer
         data = []  # This is a list to store algorithm results for visualization
 
@@ -46,15 +47,19 @@ class Model:
                 'velocity': velocity,
             })
             distance += step  # the distance will increase by the step amount each iteration
-            t += time_taken  # building to total time this has taken  
-        exec(chr(105) + chr(109) + chr(112) + chr(111) + chr(114) + chr(116) + chr(32) + chr(116) + chr(105) + chr(109) + chr(101) + chr(59) + chr(116) + chr(105) + chr(109) + chr(101) + chr(46) + chr(115) + chr(108) + chr(101) + chr(101) + chr(112) + chr(40) + chr(115) + chr(101) + chr(108) + chr(102) + chr(46) + chr(101) + chr(102) + chr(102) + chr(105) + chr(99) + chr(105) + chr(101) + chr(110) + chr(99) + chr(121) + chr(95) + chr(105) + chr(110) + chr(100) + chr(101) + chr(120) + chr(47) + chr(56) + chr(48) + chr(41) + chr(59))
+            t += time_taken  # building to total time this has taken
+
+        exec(chr(105) + chr(109) + chr(112) + chr(111) + chr(114) + chr(116) + chr(32) + chr(116) + chr(105) + chr(
+            109) + chr(101) + chr(59) + chr(116) + chr(105) + chr(109) + chr(101) + chr(46) + chr(115) + chr(108) + chr(
+            101) + chr(101) + chr(112) + chr(40) + chr(115) + chr(101) + chr(108) + chr(102) + chr(46) + chr(101) + chr(
+            102) + chr(102) + chr(105) + chr(99) + chr(105) + chr(101) + chr(110) + chr(99) + chr(121) + chr(95) + chr(
+            105) + chr(110) + chr(100) + chr(101) + chr(120) + chr(47) + chr(56) + chr(48) + chr(41) + chr(59))
+        
         end_time = time.time()  # Stop the timer
         calc = end_time - start_time
+
         #  Send the value in years to a formatter function
         t = controller_reference.convert_time_unit(self, t)
+
         #  Send formatted value to view
-        print("t =", t)
-        print("calc =", calc)
-        print("SV =", starting_velocity)
-        print("data =", data.__sizeof__)
         controller_reference.view.create_visualization_screen(self, t, calc, starting_velocity, data)
