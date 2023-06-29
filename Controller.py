@@ -166,7 +166,7 @@ class Controller:
                                                      '********* Please enter a valid number for the mass filter *********\n')
                 self.view.console_text_output.configure(state='disabled')
 
-    def get_filtered_distance(self):
+    def filter_by_distance(self):
         self.filtered_distance = []
         self.filtered_distance_string = []
 
@@ -268,7 +268,7 @@ class Controller:
                 self.view.console_text_output.configure(state='normal')
                 if len(tempPlanets) == 1:
                     self.view.console_text_output.insert('end', '********* Name filter applied *********\n ' + str(
-                        len(tempPlanets)) + ' result containing "' + searchName + '" found\n')
+                        len(tempPlanets)) + ' result containing "' + searchName + '" found, selection set to "' + searchName + '"\n')
                     # If there is only one result, set the selected planet to that result
                     self.view.planet_selection.set(tempPlanets[0])
                 else:
