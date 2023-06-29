@@ -125,12 +125,12 @@ class Controller:
             if self.inputted_mass <= 0:
                 self.view.console_text_output.configure(state='normal')
                 self.view.console_text_output.insert('end',
-                                                     '********* Mass value must be greater than zero *********\n')
+                                                     'ERROR: Mass value must be greater than zero \n')
                 self.view.console_text_output.configure(state='disabled')
                 return
 
             self.view.console_text_output.configure(state='normal')
-            self.view.console_text_output.insert('end', '********* Mass filter applied *********\n')
+            self.view.console_text_output.insert('end', 'SUCCESS: Mass filter applied \n')
             self.view.mass_input.delete(0, 'end')
 
             for planet in self.model.filteredPlanets:
@@ -158,12 +158,12 @@ class Controller:
         except ValueError:
             if not self.inputted_mass_string:
                 self.view.console_text_output.configure(state='normal')
-                self.view.console_text_output.insert('end', '********* Mass filter value cannot be empty *********\n')
+                self.view.console_text_output.insert('end', 'ERROR: Mass filter value cannot be empty \n')
                 self.view.console_text_output.configure(state='disabled')
             else:
                 self.view.console_text_output.configure(state='normal')
                 self.view.console_text_output.insert('end',
-                                                     '********* Please enter a valid number for the mass filter *********\n')
+                                                     'ERROR: Please enter a valid number for the mass filter \n')
                 self.view.console_text_output.configure(state='disabled')
 
     def filter_by_distance(self):
@@ -177,15 +177,15 @@ class Controller:
             if self.inputted_distance <= 0:
                 self.view.console_text_output.configure(state='normal')
                 self.view.console_text_output.insert('end',
-                                                     '********* Range value must be greater than zero *********\n')
+                                                     'ERROR: Range value must be greater than zero\n')
                 self.view.console_text_output.configure(state='disabled')
                 return
 
             self.view.console_text_output.configure(state='normal')
-            self.view.console_text_output.insert('end', '********* Range filter applied *********\n')
+            self.view.console_text_output.insert('end', 'SUCCESS: Range filter applied\n')
             self.view.range_input.delete(0, 'end')
 
-            for planet in self.model.filteredPlanets:  # Use the filtered_mass list instead of self.model.filteredPlanets
+            for planet in self.model.filteredPlanets:
                 if hasattr(planet, 'distance') and float(planet.distance) < self.inputted_distance:
                     self.filtered_distance_string.append(planet)
                     self.filtered_distance.append(planet.name)
@@ -211,12 +211,12 @@ class Controller:
         except ValueError:
             if not self.inputted_distance_string:
                 self.view.console_text_output.configure(state='normal')
-                self.view.console_text_output.insert('end', '********* Range filter value cannot be empty *********\n')
+                self.view.console_text_output.insert('end', 'ERROR: Range filter value cannot be empty \n')
                 self.view.console_text_output.configure(state='disabled')
             else:
                 self.view.console_text_output.configure(state='normal')
                 self.view.console_text_output.insert('end',
-                                                     '********* Please enter a valid number for the range filter *********\n')
+                                                     'ERROR: Please enter a valid number for the range filter \n')
                 self.view.console_text_output.configure(state='disabled')
 
     def filter_by_name(self):
@@ -226,22 +226,19 @@ class Controller:
         # If the user submits without entering a name
         if searchName == "":
             self.view.console_text_output.configure(state='normal')
-            self.view.console_text_output.insert('end', '********* Name filter value cannot be empty *********\n')
+            self.view.console_text_output.insert('end', 'ERROR: Name filter value cannot be empty \n')
             self.view.console_text_output.configure(state='disabled')
             # Clear the input field
             self.view.name_input.delete(0, 'end')
             return
 
-        # The longest name in the data is 29 characters (including spaces)
-        if len(searchName) > 29:
+        # Input cannot exceed 30 characters
+        if len(searchName) > 30:
             self.view.console_text_output.configure(state='normal')
-            self.view.console_text_output.insert('end', '********* No results found *********\n')
+            self.view.console_text_output.insert('end', 'Error: Name filter value cannot exceed 30 characters \n')
             self.view.console_text_output.configure(state='disabled')
             # Clear the input field
             self.view.name_input.delete(0, 'end')
-            # Set the drop-down list to empty
-            self.view.selection_dropdown.configure(values=[])
-            self.view.planet_selection.set("********* No results found *********")
             return
 
         # Check the dataset for the specified string
@@ -255,7 +252,7 @@ class Controller:
             if len(tempPlanets) == 0:
                 self.view.console_text_output.configure(state='normal')
                 self.view.console_text_output.insert('end',
-                                                     '********* Name filter applied *********\n no results containing "' + searchName + '" found\n')
+                                                     'SUCCESS: Name filter applied \n no results containing "' + searchName + '" found\n')
                 self.view.console_text_output.configure(state='disabled')
                 # Clear the input field
                 self.view.name_input.delete(0, 'end')
@@ -267,12 +264,12 @@ class Controller:
                 self.model.filteredPlanets = tempPlanets
                 self.view.console_text_output.configure(state='normal')
                 if len(tempPlanets) == 1:
-                    self.view.console_text_output.insert('end', '********* Name filter applied *********\n ' + str(
+                    self.view.console_text_output.insert('end', 'SUCCESS: Name filter applied \n ' + str(
                         len(tempPlanets)) + ' result containing "' + searchName + '" found, selection set to "' + searchName + '"\n')
                     # If there is only one result, set the selected planet to that result
                     self.view.planet_selection.set(tempPlanets[0])
                 else:
-                    self.view.console_text_output.insert('end', '********* Name filter applied *********\n ' + str(
+                    self.view.console_text_output.insert('end', 'SUCCESS: Name filter applied \n' + str(
                         len(tempPlanets)) + ' results containing "' + searchName + '" found\n')
                     self.view.planet_selection.set("Select a planet")
                 self.view.console_text_output.configure(state='disabled')
