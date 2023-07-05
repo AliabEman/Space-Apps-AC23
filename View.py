@@ -1,3 +1,4 @@
+import subprocess
 import tkinter
 from tkinter import ttk, PhotoImage, scrolledtext
 import pygame as pygame
@@ -290,6 +291,8 @@ class View(ttk.Frame):
         if selected_planet is None:
             return
         else:
+            # Retrieve the parameters you want to send
+            subprocess.Popen(['python', 'Planet_Simulation.py', str(selected_planet),str(efficiency_index),str(selected_planet.mass),str(selected_planet.distance)])
 
            
             # define some test data to display
@@ -303,35 +306,35 @@ class View(ttk.Frame):
                 starting_velocity)
 
             # define the window
-            pygame.init()
-            screen = pygame.display.set_mode((800, 800))
-            pygame.display.set_caption("SandGlass Visualizer")
+            #pygame.init()
+            #screen = pygame.display.set_mode((800, 800))
+            #pygame.display.set_caption("SandGlass Visualizer")
 
             # define the text for display test
-            font = pygame.font.SysFont("Arial", 20)
-            line_height = font.get_linesize()
-            text_render = font.render(text, True, (255, 255, 255))
+            # font = pygame.font.SysFont("Arial", 20)
+            # line_height = font.get_linesize()
+            # text_render = font.render(text, True, (255, 255, 255))
 
-            # split the text into lines
-            lines = text.split("\n")
+            # # split the text into lines
+            # lines = text.split("\n")
 
-            # Pygame loop
-            running = True
-            while running:
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        running = False
+            # # Pygame loop
+            # running = True
+            # while running:
+            #     for event in pygame.event.get():
+            #         if event.type == pygame.QUIT:
+            #             running = False
 
-                # clear the screen
-                screen.fill((0, 0, 0))
+            #     # clear the screen
+            #     screen.fill((0, 0, 0))
 
-                for i in range(len(lines)):
-                    line_render = font.render(lines[i], True, (255, 255, 255))
-                    screen.blit(line_render, (10, 10 + i * line_height))
+            #     for i in range(len(lines)):
+            #         line_render = font.render(lines[i], True, (255, 255, 255))
+            #         screen.blit(line_render, (10, 10 + i * line_height))
 
-                pygame.display.flip()
+            #     pygame.display.flip()
 
-            pygame.quit()
+            # pygame.quit()
 
     # View method to instantiate a media player and playback video capture / audio using the cv2 library for the
     # purposes of the SandGlass in application tutorial video
