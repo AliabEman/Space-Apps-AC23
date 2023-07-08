@@ -55,8 +55,9 @@ class Controller:
 
         elif selected_planet == "No results found":
             self.view.console_text_output.configure(state='normal')
-            self.view.console_text_output.insert('end', 'No planets are available in the current list, '
-                                                        'please clear filters and start again\n')
+            self.view.console_text_output.insert('end',
+                                                 'Invalid selection, No planets are available in the current list, '
+                                                 'please clear filters and start again\n')
             self.view.console_text_output.configure(state='disabled')
             return
 
@@ -192,7 +193,7 @@ class Controller:
 
             if len(self.filtered_distance_string) == 0:
                 self.view.console_text_output.insert('end', 'No results found with distance less than ' + str(
-                    self.inputted_distance) + '\n')
+                    self.inputted_distance) + ' Parsecs from Earth.\n')
                 self.view.console_text_output.configure(state='disabled')
                 self.view.name_input.delete(0, 'end')
                 self.view.selection_dropdown.configure(values=self.filtered_distance)
@@ -202,7 +203,7 @@ class Controller:
             self.model.filteredPlanets = self.filtered_distance_string
             self.view.console_text_output.insert('end', str(len(
                 self.filtered_distance_string)) + ' results found with distance less than ' + str(
-                self.inputted_distance) + '\n')
+                self.inputted_distance) + ' Parsecs from Earth.\n')
             self.view.console_text_output.configure(state='disabled')
             self.view.name_input.delete(0, 'end')
             self.view.selection_dropdown.configure(values=self.filtered_distance)
@@ -279,51 +280,119 @@ class Controller:
                 self.view.selection_dropdown.configure(values=tempPlanets)
 
     # Function that creates a window with the "about" information of the application
-    def about_app(self):
-        # define the window
-        pygame.init()
-        screen = pygame.display.set_mode((800, 500))
-        pygame.display.set_caption("About the Application")
+    def about_app(self, w, h):
 
-        # Function that will send text to the next line when it finds a \n (since pygame can't process them)
-        def process_newlines(text_to_split):
-            # Create a list where every element is a line of text up to a newline character. Deletes the newline character
-            split_text = text_to_split.split('\n')
+        try:
+            pygame.init()
 
-            # Create a list of surfaces, where each surface in the list is one line of text
-            surfaces = []
-            for sentence in split_text:
-                new_surface = font.render(sentence, True, (255, 255, 255))
-                surfaces.append(new_surface)
-            return surfaces
+            # define the window
+            # Define the parent frame size in relation to application display specifications
+            WIDTH = w - 200
+            HEIGHT = h
 
-        # Define the text to display
-        font = pygame.font.SysFont("Arial", 20)
-        text = "SandGlass has been created for the NASA SpaceApps 2023 Competition!"
-        text += "\n\nSandGlass is an interactive application for interfacing with the NASA Exoplanet archives database in\n" \
-                "order to determine the point when an individual planet will leave the currently viewable universe\n" \
-                "SandGlass allows the user to filter and select from all known Exoplanets classified by NASA based on the\n" \
-                "planets title, current distance from earth in parsecs (pc), and planetary mass in relation to Earth.\n" \
-                "Using the current Hubble constant and the maximum distance viewable by the hubble telescope Sandglass\n" \
-                "is able to determine how many years it will take for a planet to reach the edge of the viewable universe\n" \
-                "based on universal expansion theory."
-        text += "\n\nAuthors:\nAlexander Lapierre\nAliab Eman\nDylan Carroll\nGreg Rowat\nJay Patel\nSavas Erturk\n\n"
+            screen = pygame.display.set_mode((WIDTH, HEIGHT))
+            pygame.display.set_caption("About the Sandglass Application")
+            clock = pygame.time.Clock()
 
-        # Create an array that will store the lines that fit into the window
-        formatted_text = process_newlines(text)
+            # Load the background image and scale it to match the screen size
+            background_image = pygame.image.load("images/visualization_background.jpg").convert()
+            background_picture = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
 
-        # Pygame loop
-        running = True
-        while running:
-            yPosition = 10
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
+            # Function that will send text to the next line when it finds a \n (since pygame can't process them)
+            def process_newlines(text_to_split):
+                # Create a list where every element is a line of text up to a newline character. Deletes the newline character
+                split_text = text_to_split.split('\n')
 
-            # Print each surface in the list
-            for surface in formatted_text:
-                screen.blit(surface, (10, yPosition))
-                yPosition += 20  # Increment the y position for blit so each surface prints on a new line
-            pygame.display.flip()
+                # Create a list of surfaces, where each surface in the list is one line of text
+                surfaces = []
+                for sentence in split_text:
+                    new_surface = font.render(sentence, True, (255, 255, 255))
+                    surfaces.append(new_surface)
+                return surfaces
 
-        pygame.quit()
+            # load each frame of the gif image into array
+            frames = []
+            for i in range(61):
+                frames.append(pygame.image.load(f"images/frames/frame ({i + 1}).gif").convert_alpha())
+
+            # Define the text to display
+            header_font = pygame.font.SysFont("Times New Roman", 60)
+            sub_header_font = pygame.font.SysFont("Times New Roman", 35)
+            font = pygame.font.SysFont("Times New Roman", 25)
+
+            # define the text to be placed above the gif image
+            header_text = "Welcome to SandGlass!"
+            sub_header_text = "SandGlass has been created for the NASA SpaceApps 2023 Competition!"
+            text1 = "\n\nSandGlass is an interactive application for interfacing with the NASA Exoplanet archives " \
+                    "database in order to determine the point when an\nindividual planet will leave the currently " \
+                    "viewable universe SandGlass allows the user to filter and select from all known Exoplanets " \
+                    "classified\nby NASA based on the planets title, current distance from earth in parsecs (pc), and "\
+                    "planetary mass in relation to Earth.\nUsing the current Hubble constant, a planets distance from "\
+                    "earth, and the maximum distance viewable by the hubble telescope, Sandglass\nis able to determine"\
+                    " how many years it will take for a planet to reach the edge of the viewable universe based on " \
+                    "universal expansion theory."
+
+            # define the text to be placed below the gif image
+            text2 = "Filter your selection from over 5000 classified exo-planets while using the efficiency index to " \
+                    "adjust the accuracy and speed of your calculation\nOnce your selection has been made Sandglass" \
+                    " will perform a series of calculations using the hubble constant and initial distance from " \
+                    "earth\nto determine the exponential velocity of a planets expansion away from Earth's galaxy" \
+                    " to predict the number of years the planet will be viewable\n by the hubble telescope and " \
+                    "present the data to the user in our galactic visualizer."
+
+
+            # Create the arrays that will store the lines that fit into the window
+            formatted_text1 = process_newlines(text1)
+            formatted_text2 = process_newlines(text2)
+
+            # Pygame loop
+            running = True
+            current_frame = 0
+            while running:
+
+                # draw the background
+                screen.blit(background_picture, (0, 0))
+
+                y_position = 20
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        running = False
+
+                # draw header texts
+                header_surface = header_font.render(header_text, True, (255, 255, 255))
+                screen.blit(header_surface, (500, y_position))
+                y_position += 75
+
+                # draw sub header texts
+                sub_header_surface = sub_header_font.render(sub_header_text, True, (255, 255, 255))
+                screen.blit(sub_header_surface, (250, y_position))
+                y_position += 25
+
+                # print the first block of text
+                for surface in formatted_text1:
+                    screen.blit(surface, (75, y_position))
+                    y_position += 25  # Increment the y position for blit so each surface prints on a new line
+
+                # display each frame of the gif as an animated image
+                y_position += 30
+                screen.blit(frames[current_frame], (350, y_position))
+                current_frame += 1  # go to the next frame
+                current_frame %= len(frames)
+
+                y_position += 500
+
+                # Print the second block of text
+                for surface in formatted_text2:
+                    screen.blit(surface, (75, y_position))
+                    y_position += 25  # Increment the y position for blit so each surface prints on a new line
+                pygame.display.flip()
+                clock.tick(8)  # set the frame rate for smooth animation of the gif image
+
+            pygame.quit()
+
+        except Exception as e:
+            self.view.console_text_output.configure(state='normal')
+            self.view.console_text_output.insert('end', 'EXCEPTION: An Error was encountered opening the info window,'
+                                                        'Please try again or restart the application. \n')
+            self.view.console_text_output.configure(state='disabled')
+            pygame.quit()

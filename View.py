@@ -171,7 +171,7 @@ class View(ttk.Frame):
                                       highlightbackground="blue",
                                       font=("Arial", 20, "bold"),
                                       background="green",
-                                      command=self.controller.about_app)
+                                      command= lambda: self.controller.about_app(self.WIDTH, self.HEIGHT))
         about_button.place(relx=0.35, rely=0.18, relwidth=0.25, relheight=0.08)
 
         # create tutorial button
