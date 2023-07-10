@@ -33,7 +33,7 @@ class Planet(pygame.sprite.Sprite):
         self.speed = speed
         self.angle = 0
         self.laps_completed = 0
-        self.message = [" "," "]
+        self.message = [" ", " "]
 
     # function to update the visualization of the orbiting planet
     def update(self, center_x, center_y):
@@ -58,8 +58,7 @@ class Planet(pygame.sprite.Sprite):
 
         if self.laps_completed == 4:
             self.lap4_completed = True
-            self.message = ["Distance to the edge of Universe", " 14.26 billion pc(parsecs)"]
-
+            self.message = ["Distance to the edge of observable Universe", " 14.26 billion light years"]
 
     # function to draw sprite to surface
     def draw(self, win):
@@ -74,8 +73,6 @@ def create_visualization_screen(selected_planet, distance, sec_mass, efficiency_
     center_y = HEIGHT // 2
     p_index = random.randint(1, 6)
 
-    font = pygame.font.Font(None, 28)
-
     # Load and resize the background image
     background_image = pygame.image.load("./images/visualization_background.jpg")
     background_surface = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
@@ -85,12 +82,12 @@ def create_visualization_screen(selected_planet, distance, sec_mass, efficiency_
     # Create the Earth planet with an image
     earth_image_path = "./images/earth.png"
     earth_radius = 30
-
     earth_image = pygame.image.load(earth_image_path).convert_alpha()
-    orbiting_image = pygame.image.load(f"./images/planets/planet ({p_index}).png")
     earth = Planet(center_x, center_y, earth_radius, 0, earth_image)
     planets_group.add(earth)
 
+    # Create the Calculation planet
+    orbiting_image = pygame.image.load(f"./images/planets/planet ({p_index}).png")
     orbit_speed = 2  # Increase the orbit speed
     orbiting_planet = Planet(center_x + 150, center_y, 20, orbit_speed, orbiting_image)
     planets_group.add(orbiting_planet)
@@ -118,10 +115,10 @@ def create_visualization_screen(selected_planet, distance, sec_mass, efficiency_
 
         # Display algorithm results
         result_lines = [
-            "Name: {}".format(selected_planet),
-            "Range: {}".format(efficiency_index),
+            "Planet Name: {}".format(selected_planet),
+            "Distance from Earth in PC (parsecs): {}".format(efficiency_index),
             "Mass: {}".format(sec_mass),
-            "Efficiency: {}".format(distance)
+            "Calculation Efficiency Index: {}".format(distance)
         ]
         if orbiting_planet.lap4_completed:
             result_lines.extend((
@@ -130,9 +127,10 @@ def create_visualization_screen(selected_planet, distance, sec_mass, efficiency_
                 "Calculation Time: {} Seconds".format(str(round(float(calc), 4))),
                 "Starting Velocity: {} km/s".format(str(round(float(starting_velocity), 4)))
             ))
-        result_surface = pygame.Surface((310, len(result_lines) * 30))
+        # result_surface = pygame.Surface((310, len(result_lines) * 30))
+        result_surface = pygame.Surface((410, len(result_lines) * 30))
 
-        font = pygame.font.Font(None, 24)
+        font = pygame.font.SysFont("Times New Roman", 24)
         font_color = pygame.Color("white")
 
         for i, line in enumerate(result_lines):
@@ -143,14 +141,14 @@ def create_visualization_screen(selected_planet, distance, sec_mass, efficiency_
 
         # Display planet message
         planet_message = font.render(orbiting_planet.message[0], True, pygame.Color("white"))
-        planet_message2 = font.render(selected_planet + orbiting_planet.message[1], True, pygame.Color("white"))
+        planet_message2 = font.render(orbiting_planet.message[1], True,
+                                      pygame.Color("white"))
         message_x = orbiting_planet.rect.centerx + 10
         message_y = orbiting_planet.rect.centery - 40
 
         WIN.blit(planet_message, (message_x, message_y))
         WIN.blit(planet_message2, (message_x, message_y + planet_message.get_height()))
         pygame.display.update()
-
 
         clock.tick(60)
 
@@ -174,4 +172,4 @@ if __name__ == "__main__":
     calc = sys.argv[6]
     starting_velocity = sys.argv[7]
 
-    create_visualization_screen(selected_planet, distance, sec_mass, efficiency_index, t, calc , starting_velocity)
+    create_visualization_screen(selected_planet, distance, sec_mass, efficiency_index, t, calc, starting_velocity)
