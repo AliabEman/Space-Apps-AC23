@@ -107,12 +107,12 @@ def create_visualization_screen(selected_planet, distance, sec_mass, efficiency_
 
         WIN.blit(background_surface, (0, 0))  # Blit the background image onto the window
 
-        # Draw orbit lines while orbiting
-        for i in range(4):
-            radius = 150 + i * 50
-            ring_color = pygame.Color("red") if i == 3 else pygame.Color("white")
-            pygame.draw.circle(WIN, ring_color, (center_x, center_y), radius, 1)
-
+        for i in range(orbiting_planet.laps_completed+1):
+                if i < 4:
+                    radius = 150 + i * 50
+                    ring_color = pygame.Color("red") if i == 3 else pygame.Color("white")
+                    pygame.draw.circle(WIN, ring_color, (center_x, center_y), radius, 1)
+                
         planets_group.update(center_x, center_y)
         planets_group.draw(WIN)
 
