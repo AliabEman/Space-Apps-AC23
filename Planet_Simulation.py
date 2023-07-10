@@ -125,7 +125,17 @@ def create_visualization_screen(selected_planet, distance, sec_mass, efficiency_
                 "---------------Algorithm Results---------------",
                 "Expansion Time: {}".format(t),
                 "Calculation Time: {} Seconds".format(str(round(float(calc), 4))),
-                "Starting Velocity: {} km/s".format(str(round(float(starting_velocity), 4)))
+                "Starting Velocity: {} km/s".format(str(round(float(starting_velocity), 4))),
+                "--------------------Proofing--------------------",
+                "Initial Calculations:",
+                "Hubble Constant = 69.8km/s/Mpc",
+                "Vi = initial velocity",
+                "Vi = Hubble Constant * Mpc in distance",
+                "For {}:".format(selected_planet),
+                "Vi = 69.8 * {}".format(efficiency_index),
+                "Therefore Vi = {}".format(starting_velocity),
+                "The velocity must be recalculated as-",
+                "it is distance dependant"
             ))
         # result_surface = pygame.Surface((310, len(result_lines) * 30))
         result_surface = pygame.Surface((410, len(result_lines) * 30))
