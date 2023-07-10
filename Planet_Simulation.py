@@ -4,6 +4,7 @@ import sys
 import random
 
 pygame.init()
+
 # define the display dimensions dynamically based on system specs.
 screen_info = pygame.display.Info()
 WIDTH, HEIGHT = (screen_info.current_w - 200), (screen_info.current_h - 200)
@@ -25,14 +26,14 @@ right_part_rect = pygame.Rect(main_part_width + left_part_width, 0, right_part_w
 class Planet(pygame.sprite.Sprite):
     def __init__(self, x, y, radius, speed, image=None):
         super().__init__()
+        self.lap4_completed = False
         self.image = image
-        self.image
         self.image = pygame.transform.scale(self.image, (radius * 2, radius * 2))
         self.rect = self.image.get_rect(center=(x, y))
         self.speed = speed
         self.angle = 0
         self.laps_completed = 0
-        self.message = ""
+        self.message = [" "," "]
 
     # function to update the visualization of the orbiting planet
     def update(self, center_x, center_y):
@@ -56,7 +57,9 @@ class Planet(pygame.sprite.Sprite):
                 self.laps_completed += 1
 
         if self.laps_completed == 4:
-            self.message = "Done"
+            self.lap4_completed = True
+            self.message = ["Distance to the edge of Universe", " 14.26 billion pc(parsecs)"]
+
 
     # function to draw sprite to surface
     def draw(self, win):
@@ -118,13 +121,15 @@ def create_visualization_screen(selected_planet, distance, sec_mass, efficiency_
             "Name: {}".format(selected_planet),
             "Range: {}".format(efficiency_index),
             "Mass: {}".format(sec_mass),
-            "Efficiency: {}".format(distance),
-            "---------------Algorithm Results---------------",
-            "Expansion Time: {}".format(t),
-            "Calculation Time: {} Seconds".format(str(round(float(calc), 4))),
-            "Starting Velocity: {} km/s".format(str(round(float(starting_velocity), 4)))
+            "Efficiency: {}".format(distance)
         ]
-
+        if orbiting_planet.lap4_completed:
+            result_lines.extend((
+                "---------------Algorithm Results---------------",
+                "Expansion Time: {}".format(t),
+                "Calculation Time: {} Seconds".format(str(round(float(calc), 4))),
+                "Starting Velocity: {} km/s".format(str(round(float(starting_velocity), 4)))
+            ))
         result_surface = pygame.Surface((310, len(result_lines) * 30))
 
         font = pygame.font.Font(None, 24)
@@ -137,12 +142,16 @@ def create_visualization_screen(selected_planet, distance, sec_mass, efficiency_
         WIN.blit(result_surface, (10, 200))
 
         # Display planet message
-        planet_message = font.render(orbiting_planet.message, True, pygame.Color("white"))
-        message_x = orbiting_planet.rect.centerx - planet_message.get_width() // 2
+        planet_message = font.render(orbiting_planet.message[0], True, pygame.Color("white"))
+        planet_message2 = font.render(selected_planet + orbiting_planet.message[1], True, pygame.Color("white"))
+        message_x = orbiting_planet.rect.centerx + 10
         message_y = orbiting_planet.rect.centery - 40
-        WIN.blit(planet_message, (message_x, message_y))
 
+        WIN.blit(planet_message, (message_x, message_y))
+        WIN.blit(planet_message2, (message_x, message_y + planet_message.get_height()))
         pygame.display.update()
+
+
         clock.tick(60)
 
         # Increment distance after completing three laps
@@ -165,4 +174,4 @@ if __name__ == "__main__":
     calc = sys.argv[6]
     starting_velocity = sys.argv[7]
 
-    create_visualization_screen(selected_planet, distance, sec_mass, efficiency_index, t, calc, starting_velocity)
+    create_visualization_screen(selected_planet, distance, sec_mass, efficiency_index, t, calc , starting_velocity)
