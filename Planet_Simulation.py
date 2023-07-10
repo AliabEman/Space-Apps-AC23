@@ -104,6 +104,7 @@ def create_visualization_screen(selected_planet, distance, sec_mass, efficiency_
 
         WIN.blit(background_surface, (0, 0))  # Blit the background image onto the window
 
+        # Planet Orbit Draws as It Revolves around earth
         for i in range(orbiting_planet.laps_completed+1):
                 if i < 4:
                     radius = 150 + i * 50
