@@ -1,8 +1,10 @@
 import pygame
 import math
 import sys
+import random
 
 pygame.init()
+# define the display dimensions dynamically based on system specs.
 screen_info = pygame.display.Info()
 WIDTH, HEIGHT = (screen_info.current_w - 200), (screen_info.current_h - 200)
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -18,23 +20,21 @@ main_part_rect = pygame.Rect(0, 0, main_part_width, HEIGHT)
 left_part_rect = pygame.Rect(main_part_width, 0, left_part_width, HEIGHT)
 right_part_rect = pygame.Rect(main_part_width + left_part_width, 0, right_part_width, HEIGHT)
 
+
+# Class to define image sprites of planets for the visualization
 class Planet(pygame.sprite.Sprite):
-    def __init__(self, x, y, radius, color, speed, image=None):
+    def __init__(self, x, y, radius, speed, image=None):
         super().__init__()
-        self.color = color
         self.image = image
-        if self.image:
-            self.image = pygame.transform.scale(self.image, (radius * 2, radius * 2))
-            self.rect = self.image.get_rect(center=(x, y))
-        else:
-            self.image = pygame.Surface((radius * 2, radius * 2), pygame.SRCALPHA)
-            pygame.draw.circle(self.image, self.color, (radius, radius), radius)
-            self.rect = self.image.get_rect(center=(x, y))
+        self.image
+        self.image = pygame.transform.scale(self.image, (radius * 2, radius * 2))
+        self.rect = self.image.get_rect(center=(x, y))
         self.speed = speed
         self.angle = 0
         self.laps_completed = 0
         self.message = ""
 
+    # function to update the visualization of the orbiting planet
     def update(self, center_x, center_y):
         if self.speed != 0 and self.laps_completed < 4:  # Skip the update for the blue planet and after 4 laps
             self.angle += self.speed
@@ -58,15 +58,18 @@ class Planet(pygame.sprite.Sprite):
         if self.laps_completed == 4:
             self.message = "Done"
 
+    # function to draw sprite to surface
     def draw(self, win):
         win.blit(self.image, self.rect)
 
 
+# function to initialize and run the visualizer as a pygame process
 def create_visualization_screen(selected_planet, distance, sec_mass, efficiency_index, t, calc, starting_velocity):
     run = True
     clock = pygame.time.Clock()
     center_x = WIDTH // 2
     center_y = HEIGHT // 2
+    p_index = random.randint(1, 6)
 
     font = pygame.font.Font(None, 28)
 
@@ -81,11 +84,12 @@ def create_visualization_screen(selected_planet, distance, sec_mass, efficiency_
     earth_radius = 30
 
     earth_image = pygame.image.load(earth_image_path).convert_alpha()
-    earth = Planet(center_x, center_y, earth_radius, None, 0, earth_image)
+    orbiting_image = pygame.image.load(f"./images/planets/planet ({p_index}).png")
+    earth = Planet(center_x, center_y, earth_radius, 0, earth_image)
     planets_group.add(earth)
 
     orbit_speed = 2  # Increase the orbit speed
-    orbiting_planet = Planet(center_x + 150, center_y, 20, pygame.Color("green"), orbit_speed)
+    orbiting_planet = Planet(center_x + 150, center_y, 20, orbit_speed, orbiting_image)
     planets_group.add(orbiting_planet)
 
     while run:
