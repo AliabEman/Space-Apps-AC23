@@ -312,7 +312,7 @@ class Controller:
 
             # load each frame of the gif image into array
             frames = []
-            for i in range(61):
+            for i in range(54):
                 frames.append(pygame.image.load(f"images/frames/frame ({i + 1}).gif").convert_alpha())
 
             # Define the text to display
