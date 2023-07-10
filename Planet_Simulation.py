@@ -2,67 +2,86 @@ import pygame
 import math
 import sys
 
-# Pygame initialization
 pygame.init()
-WIDTH, HEIGHT = 800, 800
-WIN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.DOUBLEBUF)
+screen_info = pygame.display.Info()
+WIDTH, HEIGHT = (screen_info.current_w - 200), (screen_info.current_h - 200)
+WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Planet Simulation")
 
+# Define the dimensions of each part
+main_part_width = WIDTH - 400  # Width of the main part
+left_part_width = 200  # Width of the left part
+right_part_width = 200  # Width of the right part
+
+# Define the Rect objects for each part
+main_part_rect = pygame.Rect(0, 0, main_part_width, HEIGHT)
+left_part_rect = pygame.Rect(main_part_width, 0, left_part_width, HEIGHT)
+right_part_rect = pygame.Rect(main_part_width + left_part_width, 0, right_part_width, HEIGHT)
+
 class Planet(pygame.sprite.Sprite):
-    def __init__(self, x, y, radius, color, speed):
+    def __init__(self, x, y, radius, color, speed, image=None):
         super().__init__()
-        self.image = pygame.Surface((radius * 2, radius * 2), pygame.SRCALPHA)
-        pygame.draw.circle(self.image, color, (radius, radius), radius)
-        self.rect = self.image.get_rect(center=(x, y))
+        self.color = color
+        self.image = image
+        if self.image:
+            self.image = pygame.transform.scale(self.image, (radius * 2, radius * 2))
+            self.rect = self.image.get_rect(center=(x, y))
+        else:
+            self.image = pygame.Surface((radius * 2, radius * 2), pygame.SRCALPHA)
+            pygame.draw.circle(self.image, self.color, (radius, radius), radius)
+            self.rect = self.image.get_rect(center=(x, y))
         self.speed = speed
         self.angle = 0
         self.laps_completed = 0
-        self.distance_incremented = False
+        self.message = ""
 
     def update(self, center_x, center_y):
-        if self.speed != 0:  # Skip the update for the blue planet
+        if self.speed != 0 and self.laps_completed < 4:  # Skip the update for the blue planet and after 4 laps
             self.angle += self.speed
 
             # Update position based on the angle and laps completed
-            if self.laps_completed < 3:
-                if not self.distance_incremented:
-                    radius = 150 + self.laps_completed * 50
-                    self.rect.center = (
-                        center_x + radius * math.cos(math.radians(self.angle)),
-                        center_y + radius * math.sin(math.radians(self.angle))
-                    )
-                else:
-                    radius = 200 + (self.laps_completed - 3) * 50
-                    self.rect.center = (
-                        center_x + radius * math.cos(math.radians(self.angle)),
-                        center_y + radius * math.sin(math.radians(self.angle))
-                    )
+            if self.laps_completed < 4:
+                radius = 150 + self.laps_completed * 50
             else:
-                radius = 200 + (3 - 1) * 50
-                self.rect.center = (
-                    center_x + radius * math.cos(math.radians(self.angle)),
-                    center_y + radius * math.sin(math.radians(self.angle))
-                )
+                radius = 200 + (self.laps_completed - 3) * 50
+
+            self.rect.center = (
+                center_x + radius * math.cos(math.radians(self.angle)),
+                center_y + radius * math.sin(math.radians(self.angle))
+            )
+
+            # Check if the planet completed a full lap
+            if self.angle >= 360:
+                self.angle = 0
+                self.laps_completed += 1
+
+        if self.laps_completed == 4:
+            self.message = "Done"
 
     def draw(self, win):
         win.blit(self.image, self.rect)
 
-def create_visualization_screen(selected_planet, efficiency_index, sec_mass):
+
+def create_visualization_screen(selected_planet, distance, sec_mass, efficiency_index, t, calc, starting_velocity):
     run = True
     clock = pygame.time.Clock()
-
     center_x = WIDTH // 2
     center_y = HEIGHT // 2
 
     font = pygame.font.Font(None, 28)
 
     # Load and resize the background image
-    background_image = pygame.image.load("./images/galaxy.jpg")
+    background_image = pygame.image.load("./images/visualization_background.jpg")
     background_surface = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
 
     planets_group = pygame.sprite.Group()
 
-    earth = Planet(center_x, center_y, 30, pygame.Color("blue"), 0)
+    # Create the Earth planet with an image
+    earth_image_path = "./images/earth.png"
+    earth_radius = 30
+
+    earth_image = pygame.image.load(earth_image_path).convert_alpha()
+    earth = Planet(center_x, center_y, earth_radius, None, 0, earth_image)
     planets_group.add(earth)
 
     orbit_speed = 2  # Increase the orbit speed
@@ -73,24 +92,51 @@ def create_visualization_screen(selected_planet, efficiency_index, sec_mass):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    run = False
 
         orbiting_planet.update(center_x, center_y)
 
         WIN.blit(background_surface, (0, 0))  # Blit the background image onto the window
 
         # Draw orbit lines while orbiting
-        for i in range(min(orbiting_planet.laps_completed + 1, 4)):
+        for i in range(4):
             radius = 150 + i * 50
-            pygame.draw.circle(WIN, pygame.Color("white"), (center_x, center_y), radius, 1)
+            ring_color = pygame.Color("red") if i == 3 else pygame.Color("white")
+            pygame.draw.circle(WIN, ring_color, (center_x, center_y), radius, 1)
 
         planets_group.update(center_x, center_y)
         planets_group.draw(WIN)
 
-        # Display planet information at the top of the screen
-        info_text = f"Selected Planet: {selected_planet} | Efficiency: {efficiency_index} | Mass: {sec_mass}"
-        
-        info_surface = font.render(info_text, True, pygame.Color("white"))
-        WIN.blit(info_surface, (10, 10))
+        # Display algorithm results
+        result_lines = [
+            "Name: {}".format(selected_planet),
+            "Range: {}".format(efficiency_index),
+            "Mass: {}".format(sec_mass),
+            "Efficiency: {}".format(distance),
+            "---------------Algorithm Results---------------",
+            "Expansion Time: {}".format(t),
+            "Calculation Time: {} Seconds".format(str(round(float(calc), 4))),
+            "Starting Velocity: {} km/s".format(str(round(float(starting_velocity), 4)))
+        ]
+
+        result_surface = pygame.Surface((310, len(result_lines) * 30))
+
+        font = pygame.font.Font(None, 24)
+        font_color = pygame.Color("white")
+
+        for i, line in enumerate(result_lines):
+            line_surface = font.render(line, True, font_color)
+            result_surface.blit(line_surface, (10, i * 30))
+
+        WIN.blit(result_surface, (10, 200))
+
+        # Display planet message
+        planet_message = font.render(orbiting_planet.message, True, pygame.Color("white"))
+        message_x = orbiting_planet.rect.centerx - planet_message.get_width() // 2
+        message_y = orbiting_planet.rect.centery - 40
+        WIN.blit(planet_message, (message_x, message_y))
 
         pygame.display.update()
         clock.tick(60)
@@ -99,16 +145,20 @@ def create_visualization_screen(selected_planet, efficiency_index, sec_mass):
         if orbiting_planet.laps_completed == 3:
             orbiting_planet.distance_incremented = True
 
-        # Check if the planet completed a full lap
-        if orbiting_planet.angle >= 360:
-            orbiting_planet.angle = 0
-            orbiting_planet.laps_completed += 1
+        # Stop orbiting after the fourth lap
+        if orbiting_planet.laps_completed == 4:
+            orbiting_planet.speed = 0
 
     pygame.quit()
 
+
 if __name__ == "__main__":
     selected_planet = sys.argv[1]
-    efficiency_index = sys.argv[2]
+    distance = sys.argv[2]
     sec_mass = sys.argv[3]
+    efficiency_index = sys.argv[4]
+    t = sys.argv[5]
+    calc = sys.argv[6]
+    starting_velocity = sys.argv[7]
 
-    create_visualization_screen(selected_planet, efficiency_index, sec_mass)
+    create_visualization_screen(selected_planet, distance, sec_mass, efficiency_index, t, calc, starting_velocity)

@@ -111,7 +111,7 @@ class Controller:
         self.view.console_text_output.configure(state='normal')
         self.view.console_text_output.insert('end',
                                              'Efficiency index of calculation set to %' + str(efficiency_value) +
-                                             'factor of calculation increments\n')
+                                             ' factor of calculation increments\n')
         self.view.console_text_output.configure(state='disabled')
 
     def filter_by_mass(self):
