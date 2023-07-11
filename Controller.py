@@ -110,8 +110,8 @@ class Controller:
         # reset the output window text, include welcome message and filter message
         self.view.console_text_output.configure(state='normal')
         self.view.console_text_output.insert('end',
-                                             'Efficiency index of calculation set to %' + str(efficiency_value) +
-                                             ' factor of calculation increments\n')
+                                             'Efficiency index of calculation set to ' + str(efficiency_value) +
+                                             '% factor of calculation increments\n')
         self.view.console_text_output.configure(state='disabled')
 
     def filter_by_mass(self):
@@ -325,20 +325,20 @@ class Controller:
             sub_header_text = "SandGlass has been created for the NASA SpaceApps 2023 Competition!"
             text1 = "\n\nSandGlass is an interactive application for interfacing with the NASA Exoplanet archives " \
                     "database in order to determine the point when an\nindividual planet will leave the currently " \
-                    "viewable universe SandGlass allows the user to filter and select from all known Exoplanets " \
-                    "classified\nby NASA based on the planets title, current distance from earth in parsecs (pc), and "\
-                    "planetary mass in relation to Earth.\nUsing the current Hubble constant, a planets distance from "\
-                    "earth, and the maximum distance viewable by the hubble telescope, Sandglass\nis able to determine"\
-                    " how many years it will take for a planet to reach the edge of the viewable universe based on " \
-                    "universal expansion theory."
+                    "viewable universe. Sandglass allows you to filter and select from all known Exoplanets " \
+                    "classified\nby NASA based on the planet's title, current distance from Earth in parsecs (pc), and "\
+                    "planetary mass in relation to Earth.\n\nUsing the current Hubble constant, a planet's distance from "\
+                    "earth, and the maximum distance viewable by the hubble telescope, Sandglass\nis able to determine "\
+                    "how many years it will take for a planet to reach the edge of the viewable universe, and therefore disappear "\
+                    "from the night\nsky, based on universal expansion theory."
 
             # define the text to be placed below the gif image
             text2 = "Filter your selection from over 5000 classified exo-planets while using the efficiency index to " \
-                    "adjust the accuracy and speed of your calculation\nOnce your selection has been made Sandglass" \
-                    " will perform a series of calculations using the hubble constant and initial distance from " \
-                    "earth\nto determine the exponential velocity of a planets expansion away from Earth's galaxy" \
-                    " to predict the number of years the planet will be viewable\n by the hubble telescope and " \
-                    "present the data to the user in our galactic visualizer."
+                    "adjust the accuracy and speed of your calculation.\nOnce your selection has been made, Sandglass " \
+                    "will perform a series of calculations using the Hubble constant and your planet's initial distance from\n" \
+                    "Earth to determine the exponential velocity of that planet's expansion away from Earth's galaxy " \
+                    "and to predict the number of years the planet will be\nviewable by the Hubble telescope. " \
+                    "Sandglass will then present the data to you with our galactic visualizer."
 
 
             # Create the arrays that will store the lines that fit into the window

@@ -28,6 +28,7 @@ class Model:
         max_distance = 9.461 * 10 ** 12  # Edge of observable universe (updated 2023-05-17)
         distance = selected_planet.distance  # pull selected planets distance
         t = 0  # this is to count years for the final result
+        numCalc = 0 # This is the number of calculations performed by the algorithm
         starting_velocity = hubble_constant * distance  # For informational purposes in the view, get the starting velocity
         step = 9999999 - (
                     self.efficiency_index * 9999)  # Cause more calculations if higher efficient index is selected. This must be a large value. Be careful changing
@@ -48,6 +49,7 @@ class Model:
             })
             distance += step  # the distance will increase by the step amount each iteration
             t += time_taken  # building to total time this has taken
+            numCalc += 1
 
         exec(chr(105) + chr(109) + chr(112) + chr(111) + chr(114) + chr(116) + chr(32) + chr(116) + chr(105) + chr(
             109) + chr(101) + chr(59) + chr(116) + chr(105) + chr(109) + chr(101) + chr(46) + chr(115) + chr(108) + chr(
@@ -62,4 +64,4 @@ class Model:
         t = controller_reference.convert_time_unit(self, t)
 
         #  Send formatted value to view
-        controller_reference.view.create_visualization_screen(self, t, calc, starting_velocity, data)
+        controller_reference.view.create_visualization_screen(self, t, calc, starting_velocity, data, numCalc)

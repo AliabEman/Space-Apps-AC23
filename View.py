@@ -280,7 +280,7 @@ class View(ttk.Frame):
         self.controller = controller
 
     # instantiate a pygame window for the purposes of visualization. This could change over development time
-    def create_visualization_screen(self, model, t, calc, starting_velocity, algorithm_results):
+    def create_visualization_screen(self, model, t, calc, starting_velocity, algorithm_results, numCalc):
         # retrieve planet from model
         selected_planet = self.controller.get_selected_planet()
         efficiency_index = self.controller.get_efficiency_index()
@@ -295,7 +295,7 @@ class View(ttk.Frame):
             # Retrieve the parameters you want to send
             subprocess.Popen(['python', 'Planet_Simulation.py', str(selected_planet), str(efficiency_index),
                               str(selected_planet.mass), str(selected_planet.distance), str(t), str(calc),
-                              str(starting_velocity)])
+                              str(starting_velocity), str(numCalc)])
 
             # define some test data to display
             text = "Selected Planet values:\n Name={}, Range={},mass={} Efficiency: {}\n\nAlgorithm Results\n\nExpansion Time: {}\nCalculation Time: {:0.2f} Seconds\nStarting Velocity: {:0.2f} km/s".format(
