@@ -67,37 +67,6 @@ class Controller:
                     selected_planet = planet
                     return selected_planet
 
-    #  function to take in a value in years, and convert it in a way appropriate to display
-    #  returns string holding time with appropriate units
-    @staticmethod
-    def convert_time_unit(temp, time_in_years):
-        if time_in_years < 1:
-            time_in_months = time_in_years * 12
-            if time_in_months < 1:
-                time_in_days = time_in_months * 30
-                if time_in_days < 1:
-                    time_in_hours = time_in_days * 24
-                    if time_in_hours < 1:
-                        time_in_seconds = time_in_hours * 3600
-                        return f"{time_in_seconds:.2f} seconds"
-                    else:
-                        return f"{time_in_hours:.2f} hours"
-                else:
-                    return f"{time_in_days:.2f} days"
-            else:
-                return f"{time_in_months:.2f} months"
-        elif 1 <= time_in_years < 1000:
-            return f"{time_in_years:.2f} years"
-        elif 1000 <= time_in_years < 1000000:
-            time_in_thousands_of_years = time_in_years / 1000
-            return f"{time_in_thousands_of_years:.2f} thousand years"
-        elif 1000000 <= time_in_years < 1000000000:
-            time_in_millions_of_years = time_in_years / 1000000
-            return f"{time_in_millions_of_years:.2f} million years"
-        elif time_in_years >= 1000000000:
-            time_in_billions_of_years = time_in_years / 1000000000
-            return f"{time_in_billions_of_years:.2f} billion years"
-
     def get_efficiency_index(self):
         return self.model.efficiency_index
 

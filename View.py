@@ -280,13 +280,10 @@ class View(ttk.Frame):
         self.controller = controller
 
     # instantiate a pygame window for the purposes of visualization. This could change over development time
-    def create_visualization_screen(self, model, t, calc, starting_velocity, algorithm_results, numCalc):
+    def create_visualization_screen(self, t, calc, starting_velocity, num_calc, step):
         # retrieve planet from model
         selected_planet = self.controller.get_selected_planet()
         efficiency_index = self.controller.get_efficiency_index()
-
-        #  show what is available for visualizing here in the view
-        # print(algorithm_results)
 
         # ensure planet was passed, if object does not exist stop function and do not instantiate pygame        time_in_billions_of_years:.2f
         if selected_planet is None:
@@ -295,17 +292,7 @@ class View(ttk.Frame):
             # Retrieve the parameters you want to send
             subprocess.Popen(['python', 'Planet_Simulation.py', str(selected_planet), str(efficiency_index),
                               str(selected_planet.mass), str(selected_planet.distance), str(t), str(calc),
-                              str(starting_velocity), str(numCalc)])
-
-            # define some test data to display
-            text = "Selected Planet values:\n Name={}, Range={},mass={} Efficiency: {}\n\nAlgorithm Results\n\nExpansion Time: {}\nCalculation Time: {:0.2f} Seconds\nStarting Velocity: {:0.2f} km/s".format(
-                selected_planet.name,
-                selected_planet.distance,
-                selected_planet.mass,
-                efficiency_index,
-                t,
-                calc,
-                starting_velocity)
+                              str(starting_velocity), str(num_calc), str(step)])
 
     # View method to instantiate a media player and playback video capture / audio using the cv2 library for the
     # purposes of the SandGlass in application tutorial video

@@ -21,7 +21,6 @@ main_part_rect = pygame.Rect(0, 0, main_part_width, HEIGHT)
 left_part_rect = pygame.Rect(main_part_width, 0, left_part_width, HEIGHT)
 right_part_rect = pygame.Rect(main_part_width + left_part_width, 0, right_part_width, HEIGHT)
 
-
 # Class to define image sprites of planets for the visualization
 class Planet(pygame.sprite.Sprite):
     def __init__(self, x, y, radius, speed, image=None):
@@ -66,7 +65,8 @@ class Planet(pygame.sprite.Sprite):
 
 
 # function to initialize and run the visualizer as a pygame process
-def create_visualization_screen(selected_planet, distance, sec_mass, efficiency_index, t, calc, starting_velocity, numCalc):
+def create_visualization_screen(selected_planet, distance, sec_mass, efficiency_index, t, calc, starting_velocity,
+                                num_calc, step):
     run = True
     clock = pygame.time.Clock()
     center_x = WIDTH // 2
@@ -102,7 +102,7 @@ def create_visualization_screen(selected_planet, distance, sec_mass, efficiency_
                 if event.key == pygame.K_ESCAPE:
                     run = False
                     break
-                    
+
         # Do not execute the logic below if the animation has finished
         if (orbiting_planet.speed == 0):
             continue
@@ -112,12 +112,12 @@ def create_visualization_screen(selected_planet, distance, sec_mass, efficiency_
         WIN.blit(background_surface, (0, 0))  # Blit the background image onto the window
 
         # Planet Orbit Draws as It Revolves around earth
-        for i in range(orbiting_planet.laps_completed+1):
-                if i < 4:
-                    radius = 150 + i * 50
-                    ring_color = pygame.Color("red") if i == 3 else pygame.Color("white")
-                    pygame.draw.circle(WIN, ring_color, (center_x, center_y), radius, 1)
-                
+        for i in range(orbiting_planet.laps_completed + 1):
+            if i < 4:
+                radius = 150 + i * 50
+                ring_color = pygame.Color("red") if i == 3 else pygame.Color("white")
+                pygame.draw.circle(WIN, ring_color, (center_x, center_y), radius, 1)
+
         planets_group.update(center_x, center_y)
         planets_group.draw(WIN)
 
@@ -133,20 +133,23 @@ def create_visualization_screen(selected_planet, distance, sec_mass, efficiency_
                 "------------------Algorithm Results------------------",
                 "Expansion Time: {}".format(t),
                 "Calculation Time: {} Seconds".format(str(round(float(calc), 4))),
-                "Number of Calculations: {}".format(numCalc),
-                "Starting Velocity: {} km/s".format(str(round(float(starting_velocity), 4))),
-                "------------------------Proofing------------------------",
-                "Initial Calculations:",
+                "Number of Calculations: {}".format(num_calc),
+                "Initial Velocity: {} km/s".format(str(round(float(starting_velocity), 4))),
+                "----------------Calculation Formula------------------",
+                "First iteration of Calculation:",
                 "Hubble Constant = 69.8km/s/Mpc",
-                "Vi = initial velocity",
-                "Vi = Hubble Constant * Mpc in distance",
+                "Current velocity = Vi",
+                "Vi = Hubble Const. * Mega Parsecs from Earth ",
                 "For {}:".format(selected_planet),
                 "Vi = 69.8 * {}".format(distance),
-                "Therefore Vi = {}".format(starting_velocity),
-                "The velocity must be recalculated as ",
-                "it is distance dependant"
+                "Therefore Vi = {}".format(str(round(float(starting_velocity), 4))),
+                "step = {} Km at Efficiency Index of {} ".format(step, efficiency_index),
+                "Time = step / Vi ",
+                "Mpc from Earth = Current distance + Step",
+                "Recalculate each iteration with new distance ",
+                "and velocity to determine total time."
             ))
-        # result_surface = pygame.Surface((310, len(result_lines) * 30))
+
         result_surface = pygame.Surface((480, len(result_lines) * 30))
 
         font = pygame.font.SysFont("Times New Roman", 24)
@@ -156,7 +159,7 @@ def create_visualization_screen(selected_planet, distance, sec_mass, efficiency_
             line_surface = font.render(line, True, font_color)
             result_surface.blit(line_surface, (10, i * 30))
 
-        WIN.blit(result_surface, (10, 200))
+        WIN.blit(result_surface, (10, 100))
 
         # Display distance to edge of observable universe
         planet_message = font.render(orbiting_planet.message[0], True, pygame.Color("white"))
@@ -190,6 +193,8 @@ if __name__ == "__main__":
     t = sys.argv[5]
     calc = sys.argv[6]
     starting_velocity = sys.argv[7]
-    numCalc = sys.argv[8]
+    num_calc = sys.argv[8]
+    step = sys.argv[9]
 
-    create_visualization_screen(selected_planet, distance, sec_mass, efficiency_index, t, calc, starting_velocity, numCalc)
+    create_visualization_screen(selected_planet, distance, sec_mass, efficiency_index, t, calc, starting_velocity,
+                                num_calc, step)
