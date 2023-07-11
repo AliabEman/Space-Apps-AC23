@@ -141,7 +141,7 @@ def create_visualization_screen(selected_planet, distance, sec_mass, efficiency_
                 "Vi = initial velocity",
                 "Vi = Hubble Constant * Mpc in distance",
                 "For {}:".format(selected_planet),
-                "Vi = 69.8 * {}".format(efficiency_index),
+                "Vi = 69.8 * {}".format(distance),
                 "Therefore Vi = {}".format(starting_velocity),
                 "The velocity must be recalculated as ",
                 "it is distance dependant"
