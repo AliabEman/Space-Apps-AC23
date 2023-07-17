@@ -143,9 +143,9 @@ def create_visualization_screen(selected_planet, distance, sec_mass, efficiency_
                 "For {}:".format(selected_planet),
                 "Vi = 69.8 * {}".format(distance),
                 "Therefore Vi = {}".format(str(round(float(starting_velocity), 4))),
-                "step = {} Km at Efficiency Index of {} ".format(step, efficiency_index),
+                "Step size = {} Km at Efficiency Index of {} ".format(step, efficiency_index),
                 "Time = step / Vi ",
-                "Mpc from Earth = Current distance + Step",
+                "Mpc from Earth = Current distance + Step size",
                 "Recalculate each iteration with new distance ",
                 "and velocity to determine total time."
             ))

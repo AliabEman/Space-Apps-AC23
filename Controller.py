@@ -21,6 +21,8 @@ class Controller:
         self.model.filteredPlanets = self.model.planets
         # reset the efficiency index of the application
         self.model.efficiency_index = 1
+        # reset the efficiency slider to default position
+        self.view.efficiency_slider.set(1)
 
         # reset the output window text, include welcome message and filter message
         self.view.console_text_output.configure(state='normal')
