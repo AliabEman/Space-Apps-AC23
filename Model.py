@@ -65,14 +65,14 @@ class Model:
                 'velocity': velocity,
             })
             numCalc +=1
-
-        t = '{:.5g}'.format(t) # format result to fit on view
+        end_time = time.time()  # Stop the timer
+        t = '{:.5g}'.format(t) # format scientific notation of time to be limited to 5 digits
         t = str(t) + " years"
         end_time = time.time()  # Stop the timer
         calc = end_time - start_time
 
-        step = '{:.5g}'.format(step) # format result to fit on view
-        t = str(t) 
+        step = '{:.5g}'.format(step) # format scientific notation representing step size to be limited to 5 digits
+        step = str(step) 
 
         #  Send formatted value to view
         controller_reference.view.create_visualization_screen(t, calc, starting_velocity, numCalc, step)
