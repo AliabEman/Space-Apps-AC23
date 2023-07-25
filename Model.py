@@ -10,10 +10,12 @@ class Model:
 
         ##
         # URL for the TAP API endpoint
-        url = "https://exoplanetarchive.ipac.caltech.edu/TAP/sync"
+        # url = "https://exoplanetarchive.ipac.caltech.edu/TAP/sync"
+        url = "https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+*+from+pscomppars&format=json"
 
-        # Construct the query to select all planets
-        query = "SELECT DISTINCT pl_name, pl_msinie, sy_dist FROM ps WHERE pl_name IS NOT NULL AND pl_msinie IS NOT NULL AND sy_dist IS NOT NULL ORDER BY pl_name"
+        # Construct the query to select all planets that
+        query = "SELECT pl_name, pl_msinie, sy_dist FROM ps WHERE sy_dist IS NOT NULL ORDER BY pl_name"
+
 
         # Parameters for the API call
         params = {
@@ -29,10 +31,19 @@ class Model:
             if response.status_code == 200:
                 data_list = json.loads(response.text)
                 print(data_list)
+                
+                # Create a set to store planet names that have been added
+                added_planet_names = set()
+
                 for data in data_list:
-                    planet = Planet(name=data['pl_name'], mass=data['pl_msinie'], distance=data['sy_dist'])
-                    self.planets.append(planet)
-                #print("Planets Loaded: " + len(self.planets))
+                    planet_name = data['pl_name']
+                    if planet_name not in added_planet_names:
+                        planet = Planet(name=data['pl_name'], mass=data['pl_msinie'], distance=data['sy_dist'])
+                        self.planets.append(planet)
+                        added_planet_names.add(planet_name)
+
+                # Print the number of planets loaded
+                print("Planets Loaded from NASA Exoplanet Archive:", len(self.planets))
 
             else:
                 print("Error: Unable to fetch data from the API.")
@@ -45,6 +56,8 @@ class Model:
                 if data['name'] != 'name':
                     planet = Planet(name=data['name'], mass=data['mass'], distance=data['distance'])
                     self.planets.append(planet)
+            # Print the number of planets loaded
+            print("Planets Loaded from NASA_PRODUCTION.csv:", len(self.planets))
 
 
 
