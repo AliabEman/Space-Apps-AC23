@@ -30,7 +30,7 @@ class Model:
 
             if response.status_code == 200:
                 data_list = json.loads(response.text)
-                print(data_list)
+                #print(data_list)
                 
                 # Create a set to store planet names that have been added
                 added_planet_names = set()
@@ -47,7 +47,14 @@ class Model:
 
             else:
                 print("Error: Unable to fetch data from the API.")
-                    # instantiate planet objects to add to the Model list via the CSV data dictionary on initialization
+                print("Loading Existing Data:")
+                # instantiate planet objects to add to the Model list via the CSV data dictionary on initialization
+                for data in planet_data:
+                    if data['name'] != 'name':
+                        planet = Planet(name=data['name'], mass=data['mass'], distance=data['distance'])
+                        self.planets.append(planet)
+                # Print the number of planets loaded
+                print("Planets Loaded from NASA_PRODUCTION.csv:", len(self.planets))
 
         except requests.exceptions.RequestException as e:
             # Connection error occurred (e.g., no internet connection)
