@@ -164,14 +164,14 @@ class View(ttk.Frame):
                                      command=self.parent.destroy)
 
         quit_button.place(relx=0.05, rely=0.18, relwidth=0.25, relheight=0.08)
-        
+
         # create about button
         about_button = tkinter.Button(self.menu_frame, text="About", bd=3, relief="raised",
                                       borderwidth=5, highlightthickness=0,
                                       highlightbackground="blue",
                                       font=("Arial", 20, "bold"),
                                       background="green",
-                                      command=self.controller.about_app)
+                                      command=lambda: self.controller.about_app(self.WIDTH, self.HEIGHT))
         about_button.place(relx=0.35, rely=0.18, relwidth=0.25, relheight=0.08)
 
         # create tutorial button
@@ -183,7 +183,7 @@ class View(ttk.Frame):
                                          command=self.play_tutorial
                                          )
         tutorial_button.place(relx=0.65, rely=0.18, relwidth=0.3, relheight=0.08)
-        
+
         # create calculate button
         calculate_button = tkinter.Button(self.menu_frame, text="Calculate", bd=3, relief="raised",
                                           borderwidth=5, highlightthickness=0,
@@ -257,7 +257,8 @@ class View(ttk.Frame):
 
         self.mass_submit_button = tkinter.Button(self.filter_frame, text="Submit", background="green", relief="raised",
                                                  borderwidth=5, highlightthickness=0, highlightbackground="blue",
-                                                 font=submit_font, justify="center", command=self.controller.filter_by_mass)
+                                                 font=submit_font, justify="center",
+                                                 command=self.controller.filter_by_mass)
         self.mass_submit_button.place(relx=0.725, rely=0.67, relwidth=0.2, relheight=0.05)
 
         self.slider_submit_button = tkinter.Button(self.filter_frame, text="Submit", background="green",
@@ -279,62 +280,19 @@ class View(ttk.Frame):
         self.controller = controller
 
     # instantiate a pygame window for the purposes of visualization. This could change over development time
-    def create_visualization_screen(self, model, t, calc, starting_velocity, algorithm_results):
+    def create_visualization_screen(self, t, calc, starting_velocity, num_calc, step):
         # retrieve planet from model
         selected_planet = self.controller.get_selected_planet()
         efficiency_index = self.controller.get_efficiency_index()
-
-        #  show what is available for visualizing here in the view
-        #print(algorithm_results)
 
         # ensure planet was passed, if object does not exist stop function and do not instantiate pygame        time_in_billions_of_years:.2f
         if selected_planet is None:
             return
         else:
             # Retrieve the parameters you want to send
-            subprocess.Popen(['python', 'Planet_Simulation.py', str(selected_planet),str(efficiency_index),str(selected_planet.mass),str(selected_planet.distance)])
-
-           
-            # define some test data to display
-            text = "Selected Planet values:\n Name={}, Range={},mass={} Efficiency: {}\n\nAlgorithm Results\n\nExpansion Time: {}\nCalculation Time: {:0.2f} Seconds\nStarting Velocity: {:0.2f} km/s".format(
-                selected_planet.name,
-                selected_planet.distance,
-                selected_planet.mass,
-                efficiency_index,
-                t,
-                calc,
-                starting_velocity)
-
-            # define the window
-            #pygame.init()
-            #screen = pygame.display.set_mode((800, 800))
-            #pygame.display.set_caption("SandGlass Visualizer")
-
-            # define the text for display test
-            # font = pygame.font.SysFont("Arial", 20)
-            # line_height = font.get_linesize()
-            # text_render = font.render(text, True, (255, 255, 255))
-
-            # # split the text into lines
-            # lines = text.split("\n")
-
-            # # Pygame loop
-            # running = True
-            # while running:
-            #     for event in pygame.event.get():
-            #         if event.type == pygame.QUIT:
-            #             running = False
-
-            #     # clear the screen
-            #     screen.fill((0, 0, 0))
-
-            #     for i in range(len(lines)):
-            #         line_render = font.render(lines[i], True, (255, 255, 255))
-            #         screen.blit(line_render, (10, 10 + i * line_height))
-
-            #     pygame.display.flip()
-
-            # pygame.quit()
+            subprocess.Popen(['python', 'Planet_Simulation.py', str(selected_planet), str(efficiency_index),
+                              str(selected_planet.mass), str(selected_planet.distance), str(t), str(calc),
+                              str(starting_velocity), str(num_calc), str(step)])
 
     # View method to instantiate a media player and playback video capture / audio using the cv2 library for the
     # purposes of the SandGlass in application tutorial video
@@ -388,4 +346,3 @@ class View(ttk.Frame):
         video.release()
         player.close_player()
         cv2.destroyAllWindows()
-        
