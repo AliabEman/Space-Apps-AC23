@@ -1,19 +1,55 @@
 from Planet import Planet
 import time
-
+import requests
+import json
 
 class Model:
 
     def __init__(self, planet_data):
         self.planets = []
 
-        # instantiate planet objects to add to the Model list via the CSV data dictionary on initialization
-        for data in planet_data:
-            if data['name'] != 'name':
-                planet = Planet(name=data['name'], mass=data['mass'], distance=data['distance'])
-                self.planets.append(planet)
+        ##
+        # URL for the TAP API endpoint
+        url = "https://exoplanetarchive.ipac.caltech.edu/TAP/sync"
 
-        # create a duplicate list so the original data can be filtered or retrieved without harm
+        # Construct the query to select all planets
+        query = "SELECT DISTINCT pl_name, pl_msinie, sy_dist FROM ps WHERE pl_name IS NOT NULL AND pl_msinie IS NOT NULL AND sy_dist IS NOT NULL ORDER BY pl_name"
+
+        # Parameters for the API call
+        params = {
+            "REQUEST": "doQuery",
+            "LANG": "ADQL",
+            "FORMAT": "json",
+            "QUERY": query
+        }
+        # Make the API call
+        try:
+            response = requests.get(url, params=params)
+
+            if response.status_code == 200:
+                data_list = json.loads(response.text)
+                print(data_list)
+                for data in data_list:
+                    planet = Planet(name=data['pl_name'], mass=data['pl_msinie'], distance=data['sy_dist'])
+                    self.planets.append(planet)
+                #print("Planets Loaded: " + len(self.planets))
+
+            else:
+                print("Error: Unable to fetch data from the API.")
+                    # instantiate planet objects to add to the Model list via the CSV data dictionary on initialization
+
+        except requests.exceptions.RequestException as e:
+            # Connection error occurred (e.g., no internet connection)
+            print(f"Connection Error: {e}\n Loading Existing Data:")
+            for data in planet_data:
+                if data['name'] != 'name':
+                    planet = Planet(name=data['name'], mass=data['mass'], distance=data['distance'])
+                    self.planets.append(planet)
+
+
+
+    ##
+      # create a duplicate list so the original data can be filtered or retrieved without harm
         self.filteredPlanets = []
         self.filteredPlanets = self.planets
 
