@@ -113,7 +113,6 @@ class View(ttk.Frame):
     # in APP
     def draw_widgets(self):
         # ///////// CONSOLE WIDGETS ///////////////////////////////////////////////////////////////////////////////////
-
         # instantiate a read only not clickable text box to act as Console output
         self.console_text_output = scrolledtext.ScrolledText(self.console_frame, wrap='word', width=30, height=10,
                                                              bg='black',
@@ -123,7 +122,7 @@ class View(ttk.Frame):
                                                              highlightbackground="white",
                                                              font=('Arial', 13),
                                                              takefocus=False)
-
+        self.console_text_output.pack(fill='both', expand=True)
         # the console text output needs to be enabled to edit the text and disabled to make it read only, This
         # will need to be done in all update methods for this widget. There may be better options then this out there
         # console_text_output.configure(state='enabled')
